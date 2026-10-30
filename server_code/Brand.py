@@ -71,7 +71,7 @@ def template_publish(name, emoji, style):
         return C.fail("You can share up to %d templates. Delete an old one first." % MAX_TEMPLATES_PER_PERSON)
     if C.rate_limited("template_publish", 10, 3600):
         return C.fail("That's a lot of templates in one hour. Please try again later.")
-    for k in ("hook", "part", "musicName"):  # personal bits stay out of a shared template
+    for k in ("hook", "part", "musicName", "layers"):  # personal bits stay out of a shared template
         style.pop(k, None)
     emoji = C.text(emoji, 8) or "✨"
     t = app_tables.templates.add_row(owner=me, name=name, emoji=emoji, style=style, uses=0, featured=False, hidden=False,

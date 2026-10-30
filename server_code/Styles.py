@@ -11,8 +11,25 @@ from . import common as C
 ASPECTS = ["9:16", "1:1", "4:5", "16:9"]
 LAYOUTS = ["fill", "fit", "framed", "split"]
 CAP_STYLES = ["pop", "karaoke", "boxed", "minimal", "neon", "comic"]
-FONTS = ["Anton", "Bricolage Grotesque", "DM Sans", "Bangers"]
+FONTS = ["Anton", "Bricolage Grotesque", "DM Sans", "Bangers", "Luckiest Guy", "Bungee", "Titan One", "Lilita One",
+         "Permanent Marker", "Pacifico", "Rubik Mono One"]
 CORNERS = ["tl", "tr", "bl", "br", "off"]
+TRANS = ["none", "fade", "flash", "zoom", "whip", "glitch", "shake", "spin", "pixel"]
+
+# Text and stickers placed on the reel (style["layers"]). Times are seconds of the finished reel.
+LAYER_TYPES = ["text", "emoji", "badge", "shape"]
+TEXT_STYLES = ["outline", "hollow", "double", "pop3d", "glow", "sticker", "marker", "plain"]
+BADGE_SHAPES = ["burst", "pill", "bubble", "circle"]
+SHAPES = ["arrow", "ring", "underline", "sparkles", "heart", "star"]
+ANIMS = ["none", "pop", "fade", "slide", "drop", "spin", "type", "zoom"]
+LOOPS = ["none", "wiggle", "float", "pulse", "shake", "spin"]
+MAX_LAYERS = 24
+LAYER_SPEC = {
+    "x": ("num", 0, 1), "y": ("num", 0, 1), "size": ("num", 0.2, 5), "rot": ("num", -180, 180),
+    "s": ("num", 0, 900), "e": ("num", 0, 900), "all": ("bool",),
+    "anim": ("enum", ANIMS), "loop": ("enum", LOOPS), "font": ("enum", FONTS), "ts": ("enum", TEXT_STYLES),
+    "fill": ("color",), "line": ("color",), "shape": ("enum", BADGE_SHAPES), "upper": ("bool",),
+}
 
 SPEC = {
     "look": ("str", 24), "aspect": ("enum", ASPECTS), "layout": ("enum", LAYOUTS),
@@ -28,6 +45,8 @@ SPEC = {
     "speed": ("num", 0.5, 2), "cutSilence": ("bool",), "silence": ("num", 0, 1), "fadeIn": ("bool",), "fadeOut": ("bool",),
     "vol": ("num", 0, 2), "musicName": ("str", 80), "musicVol": ("num", 0, 1), "duck": ("bool",),
     "quality": ("enum", ["720", "1080"]),
+    "transIn": ("enum", TRANS), "transOut": ("enum", TRANS), "transCut": ("enum", TRANS), "transLen": ("num", 0.15, 1),
+    "transScenes": ("bool",), "layers": ("layers",),
 }
 KIT_EXTRA = {"hashtags": ("str", 200)}
 COLOR = re.compile(r"^#[0-9a-fA-F]{6}$")
@@ -59,6 +78,29 @@ def clean(style, extra=None):
                 out[k] = v.upper()
         elif kind == "str":
             out[k] = C.text(v, rule[1])
+        elif kind == "layers":
+            out[k] = clean_layers(v)
+    return out
+
+
+def clean_layers(layers):
+    """Text and stickers on the reel: a list of small dicts (see LAYER_SPEC). Bad ones are dropped."""
+    out = []
+    if not isinstance(layers, list):
+        return out
+    for L in layers[:MAX_LAYERS]:
+        if not isinstance(L, dict) or L.get("t") not in LAYER_TYPES:
+            continue
+        t = L["t"]
+        v = C.text(L.get("v"), 120, multiline=(t == "text"))
+        if t == "shape" and v not in SHAPES:
+            continue
+        if not v:
+            continue
+        lay = clean({k: L[k] for k in L if k in LAYER_SPEC}, LAYER_SPEC)
+        lay = {k: lay[k] for k in lay if k in LAYER_SPEC}
+        lay.update(id=C.text(L.get("id"), 16) or ("L%d" % len(out)), t=t, v=v)
+        out.append(lay)
     return out
 
 

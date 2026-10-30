@@ -473,16 +473,16 @@ metadata:
   title: 'Reelstuber: turn long videos into reels'
 name: Reelstuber
 native_deps:
-  head_html: "<script src=\"_/theme/legal-kit.js?v=71b69bd306\"></script>\n<meta name=\"viewport\" content=\"width=device-width,\
+  head_html: "<script src=\"_/theme/legal-kit.js?v=285132ac8b\"></script>\n<meta name=\"viewport\" content=\"width=device-width,\
     \ initial-scale=1, viewport-fit=cover\">\n<meta name=\"theme-color\" content=\"#FFF7EC\">\n<meta name=\"apple-mobile-web-app-capable\"\
     \ content=\"yes\">\n<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n<link rel=\"preconnect\" href=\"\
-    https://fonts.gstatic.com\" crossorigin>\n<link href=\"https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=DM+Sans:opsz,wght@9..40,400..700&family=Anton&family=Bangers&display=swap\"\
+    https://fonts.gstatic.com\" crossorigin>\n<link href=\"https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=DM+Sans:opsz,wght@9..40,400..700&family=Anton&family=Bangers&family=Luckiest+Guy&family=Bungee&family=Titan+One&family=Lilita+One&family=Permanent+Marker&family=Pacifico&family=Rubik+Mono+One&display=swap\"\
     \ rel=\"stylesheet\">\n<link id=\"ui-favicon\" rel=\"icon\" type=\"image/svg+xml\" href=\"_/theme/icon.svg?v=40d604cc54\"\
     >\n<link rel=\"apple-touch-icon\" href=\"_/theme/icon-180.png?v=40d604cc54\">\n<script>\n/* Keep our tab icon: Anvil adds\
     \ its own <link rel=\"icon\">, so drop any other icon link. */\n(function () {\n  function keep() {\n    var ours = document.getElementById('ui-favicon');\n\
     \    if (!ours) return;\n    document.querySelectorAll('link[rel~=\"icon\"]').forEach(function (l) { if (l !== ours) l.remove();\
     \ });\n  }\n  keep();\n  document.addEventListener('DOMContentLoaded', keep);\n  window.addEventListener('load', keep);\n\
-    })();\n</script>\n<link rel=\"stylesheet\" href=\"_/theme/app.css?v=3c33e09486\">\n<script src=\"_/theme/app.js?v=830abea8e9\"\
+    })();\n</script>\n<link rel=\"stylesheet\" href=\"_/theme/app.css?v=afb58ae3b9\">\n<script src=\"_/theme/app.js?v=30742970a5\"\
     ></script>\n"
 package_name: Reelstuber
 runtime_options:

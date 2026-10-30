@@ -464,6 +464,29 @@ input[type=color] { width: 44px; height: 40px; padding: 2px; border: 2px solid v
 .ce-tpl { border: 2px solid var(--c-outline); border-radius: 16px; background: var(--c-surface); padding: 6px 6px 8px; cursor: pointer; text-align: left; color: var(--c-ink); font: inherit; }
 .ce-tpl canvas { display: block; width: 100%; border-radius: 10px; margin-bottom: 6px; }
 .ce-tpl b { display: block; font-size: .85rem; } .ce-tpl small { color: var(--c-muted); font-size: .74rem; }
+.ce-tstyles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.ce-ts, .ce-badge { border: 2px solid var(--c-outline); border-radius: 14px; background: #2A1F45; padding: 5px 5px 7px; cursor: pointer; font: 700 .74rem/1.2 var(--font-body); color: #fff; transition: transform .1s; }
+.ce-ts canvas, .ce-badge canvas { display: block; width: 100%; height: auto; border-radius: 9px; }
+.ce-ts span, .ce-badge small { display: block; margin-top: 5px; }
+.ce-ts:hover, .ce-badge:hover, .ce-emo:hover { transform: rotate(-2deg) translateY(-1px); box-shadow: 3px 3px 0 var(--c-pop); }
+.ce-badges { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 8px; }
+.ce-emo-cat > span { font: 800 .72rem/1 var(--font-body); color: var(--c-muted); text-transform: uppercase; letter-spacing: .06em; display: block; margin: 10px 0 6px; }
+.ce-emojis { display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 6px; }
+.ce-emo { font-size: 1.5rem; line-height: 1; aspect-ratio: 1; border: 2px solid var(--c-outline); border-radius: 12px; background: var(--c-surface); cursor: pointer; display: grid; place-items: center; padding: 0; transition: transform .1s; }
+.ce-layers { display: flex; flex-wrap: wrap; gap: 6px; }
+.ce-lrow { display: inline-flex; gap: 6px; align-items: center; border: 2px solid var(--c-outline); border-radius: 999px; padding: 6px 12px; background: var(--c-surface); font: 700 .82rem/1.1 var(--font-body); color: var(--c-ink); cursor: pointer; max-width: 100%; }
+.ce-lrow span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 170px; }
+.ce-lrow small { color: var(--c-muted); font-weight: 600; }
+.ce-lrow.on { background: var(--c-accent); color: var(--c-accent-ink); box-shadow: 2px 2px 0 var(--c-pop); }
+.ce-lrow.on small { color: inherit; }
+.ce-led { background: var(--c-brand-soft); display: grid; gap: 16px; }
+.ce-led-head { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.ce-led-head b { font: 800 1.05rem/1.2 var(--font-display); flex: 1; min-width: 140px; }
+.ce-led textarea { min-height: 64px; resize: vertical; }
+.ce-fonts { display: flex; gap: 6px; flex-wrap: wrap; }
+.ce-font { font-size: 1rem; padding: 8px 12px; border: 2px solid var(--c-outline); border-radius: 12px; background: var(--c-surface); color: var(--c-ink); cursor: pointer; line-height: 1.15; }
+.ce-font.on { background: var(--c-accent); color: var(--c-accent-ink); box-shadow: 2px 2px 0 var(--c-pop); }
+.ce-sub { font: 800 .74rem/1 var(--font-body); color: var(--c-muted); text-transform: uppercase; letter-spacing: .06em; margin: 0 0 8px; display: block; }
 @media (max-width: 900px) {
   .ce-grid { grid-template-columns: minmax(0, 1fr); }
   .ce-grid > * { min-width: 0; }
@@ -476,7 +499,11 @@ input[type=color] { width: 44px; height: 40px; padding: 2px; border: 2px solid v
   .ce-two { grid-template-columns: 1fr; }
   .ce-layouts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .ce-head .ce-nav { display: none; }
-  .ce-tabs button { padding: 12px 8px; font-size: .86rem; gap: 5px; }
+  .ce-tabs { gap: 0; }
+  .ce-tabs button { padding: 12px 6px; font-size: .8rem; gap: 5px; }
+  .ce-tabs button .ui-ic { display: none; }
+  .ce-tstyles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ce-emojis { grid-template-columns: repeat(5, minmax(0, 1fr)); }
 }
 
 /* ===== home.html ===== */

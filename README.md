@@ -30,11 +30,14 @@ signed out; a guest's projects live in their browser (localStorage + the video i
 - Live 9:16 preview: drag to reframe, scroll/pinch to zoom, tap to play. Trim bar with handles and ±0.25 s nudges.
 - **Look:** 7 built-in looks, community templates, share your look; shape (9:16, 4:5, 1:1, 16:9); layout (Fill, Fit + blur, Framed, Split with two crops); zoom/position; punch-in zoom on loud moments.
 - **Captions:** 6 styles (Pop, Karaoke, Boxed, Minimal, Neon, Comic), 4 fonts, size, height, words at a time, ALL CAPS, auto emoji, colours; edit every line, add lines; write on device / import / type.
-- **Text:** hook sticker (first seconds), "Part 1" label, handle in a corner, end card (call to action), progress bar.
-- **Sound:** speed 0.75-2×, cut the silences (gentle → snappy), fades, video volume, background music from the device with ducking.
+- **Text:** text boxes on the reel in 11 fonts (Anton, Bangers, Luckiest Guy, Bungee, Titan One, Lilita One, Rubik Mono One, Permanent Marker, Pacifico, Bricolage Grotesque, DM Sans) and 8 outline styles (bold outline, double, 3D pop, hollow, glow, sticker box, marker, soft shadow); fill + outline colours, size, turn, entrance (pop, fade, slide up, drop, zoom, spin, typewriter), idle motion (wiggle, float, pulse, shake, spin), timing (start/length or the whole reel). Plus the hook sticker (first seconds), "Part 1" label, handle in a corner, end card (call to action), progress bar.
+- **Stickers:** 40 emoji with a die-cut white border, 12 word stickers (OMG, WAIT…, FACTS, LINK IN BIO… as burst / pill / speech bubble / circle, editable words and colour), 6 doodles (arrow, circle it, underline, sparkles, heart, star). Same size / turn / entrance / motion / timing controls as text.
+- **On the preview:** tap text or a sticker to select it, drag to move, drag the ↻ handle to resize and turn (or scroll / pinch); Delete removes it, Esc deselects. Up to 24 per reel.
+- **FX:** transitions for the intro, between cuts (the jump cuts from Cut the silences, and optionally the video's own scene changes) and the outro: fade, flash, zoom, whip, glitch, shake, spin, pixel; length 0.15-1 s; preview buttons.
+- **Sound:** speed 0.75-2×, cut the silences (gentle → snappy), video volume, background music from the device with ducking.
 - **Post:** suggested caption + hashtags (from the clip's words and the brand kit), copy; status; export (Full HD or 720p, MP4 where the browser supports it, else WebM; optional .srt). After export: preview, download again, share (phones), copy caption, next clip. Confetti and badges.
 
-**Brand kit** (`#brand`): handle, hashtags, starting look, caption defaults, sticker colours, end card, shape/quality, cut silences, punch-in; live preview. Lists the templates you shared.
+**Brand kit** (`#brand`): handle, hashtags, starting look, caption defaults (all 11 fonts), sticker colours, end card, transitions, shape/quality, cut silences, punch-in; live preview. Lists the templates you shared.
 
 **Templates** (`#templates`): community looks (featured first, then most used) + Reelstuber originals; "Make it my default".
 
