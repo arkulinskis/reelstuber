@@ -473,7 +473,7 @@ metadata:
   title: 'Reelstuber: turn long videos into reels'
 name: Reelstuber
 native_deps:
-  head_html: "<script src=\"_/theme/legal-kit.js?v=285132ac8b\"></script>\n<meta name=\"viewport\" content=\"width=device-width,\
+  head_html: "<script src=\"_/theme/legal-kit.js?v=1b9a1890e7\"></script>\n<meta name=\"viewport\" content=\"width=device-width,\
     \ initial-scale=1, viewport-fit=cover\">\n<meta name=\"theme-color\" content=\"#FFF7EC\">\n<meta name=\"apple-mobile-web-app-capable\"\
     \ content=\"yes\">\n<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n<link rel=\"preconnect\" href=\"\
     https://fonts.gstatic.com\" crossorigin>\n<link href=\"https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=DM+Sans:opsz,wght@9..40,400..700&family=Anton&family=Bangers&family=Luckiest+Guy&family=Bungee&family=Titan+One&family=Lilita+One&family=Permanent+Marker&family=Pacifico&family=Rubik+Mono+One&display=swap\"\
