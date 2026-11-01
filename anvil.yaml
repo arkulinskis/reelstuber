@@ -473,7 +473,7 @@ metadata:
   title: 'Reelstuber: turn long videos into reels in your browser'
 name: Reelstuber
 native_deps:
-  head_html: "<script src=\"_/theme/legal-kit.js?v=7c5567081a\"></script>\n<!-- seo:start (APP_MAKER/seo: edit seo/apps/reelstuber.json\
+  head_html: "<script src=\"_/theme/legal-kit.js?v=7f2fa0c0fb\"></script>\n<!-- seo:start (APP_MAKER/seo: edit seo/apps/reelstuber.json\
     \ and run seo.py, not here) -->\n<meta name=\"robots\" content=\"index, follow, max-image-preview:large, max-snippet:-1,\
     \ max-video-preview:-1\">\n<meta name=\"keywords\" content=\"long video to shorts, video to reels, YouTube Shorts maker,\
     \ TikTok clip maker, auto captions, podcast clips, 9:16 reframe, clip finder, browser video editor\">\n<meta name=\"author\"\
