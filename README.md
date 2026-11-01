@@ -7,7 +7,7 @@ is never uploaded.** The server only keeps the edits (clip times, styles, captio
 and streamers. Built on [Anvil](https://anvil.works).
 
 - **App repo:** github.com/arkulinskis/reelstuber (branch `master`). Anvil pulls `master`.
-- **Live:** not published yet (planned: reelstuber.anvil.app or a custom domain).
+- **Live:** https://reelstuber.anvil.app
 
 ## What it does
 
@@ -28,12 +28,17 @@ signed out; a guest's projects live in their browser (localStorage + the video i
 
 **Clip editor** (`#clip/<projectId>/<clipId>`), autosaves
 - Live 9:16 preview: drag to reframe, scroll/pinch to zoom, tap to play. Trim bar with handles and ±0.25 s nudges.
-- **Look:** 7 built-in looks, community templates, share your look; shape (9:16, 4:5, 1:1, 16:9); layout (Fill, Fit + blur, Framed, Split with two crops); zoom/position; punch-in zoom on loud moments.
-- **Captions:** 6 styles (Pop, Karaoke, Boxed, Minimal, Neon, Comic), 4 fonts, size, height, words at a time, ALL CAPS, auto emoji, colours; edit every line, add lines; write on device / import / type.
-- **Text:** text boxes on the reel in 11 fonts (Anton, Bangers, Luckiest Guy, Bungee, Titan One, Lilita One, Rubik Mono One, Permanent Marker, Pacifico, Bricolage Grotesque, DM Sans) and 8 outline styles (bold outline, double, 3D pop, hollow, glow, sticker box, marker, soft shadow); fill + outline colours, size, turn, entrance (pop, fade, slide up, drop, zoom, spin, typewriter), idle motion (wiggle, float, pulse, shake, spin), timing (start/length or the whole reel). Plus the hook sticker (first seconds), "Part 1" label, handle in a corner, end card (call to action), progress bar.
+- **Look:** 9 built-in looks (Creator Clean is the default: clean captions, whip cuts), community templates, share your look; shape (9:16, 4:5, 1:1, 16:9); layout (Fill, Fit + blur, Framed, Split with two crops, **Corner card**: picture in picture with a second crop of the video or another video from the device, like a reaction or face cam, played muted and never uploaded); zoom/position; punch-in zoom on loud moments.
+- **Colour:** 8 grades with live thumbnails of the current frame (None, Warm, Moody, Cool, Teal & orange, Vivid, Film, Black & white), strength, and a **before/after slider** that sweeps across in the first 2 seconds. Moody = highlights down, blacks lifted, saturation down, soft vignette.
+- **Captions:** 7 styles (**Clean** = plain text with a soft shadow, the default; Pop, Karaoke, Boxed, Minimal, Neon, Comic), 12 fonts, size, height, words at a time, ALL CAPS, auto emoji, colours; edit every line, add lines; write on device / import / type. **Pop something on a word:** tap a caption word to drop an emoji, a title, a title behind you, a tool label, a repo card, a prompt bar or a word sticker exactly when it's said.
+- **Text:** text boxes on the reel in 12 fonts (Anton, Bangers, Luckiest Guy, Bungee, Titan One, Lilita One, Rubik Mono One, Permanent Marker, Pacifico, Bricolage Grotesque, DM Sans, Playfair Display) and 9 styles (bold outline, double, 3D pop, hollow, glow, sticker box, marker, soft shadow, **magazine** masthead with an issue line, rule and barcode); fill + outline colours, size, turn, entrance (pop, fade, slide up, drop, zoom, spin, typewriter), idle motion (wiggle, float, pulse, shake, spin), timing (start/length or the whole reel). Plus the hook sticker (first seconds), "Part 1" label, handle in a corner, end card (call to action), progress bar.
 - **Stickers:** 40 emoji with a die-cut white border, 12 word stickers (OMG, WAIT…, FACTS, LINK IN BIO… as burst / pill / speech bubble / circle, editable words and colour), 6 doodles (arrow, circle it, underline, sparkles, heart, star). Same size / turn / entrance / motion / timing controls as text.
+- **Cards:** a tool label (app-icon tile + name), a GitHub-style repo card (name, description, Star / Fork) and a prompt bar that types itself out (optional small label, accent colour). Plus one-tap **Magazine cover** and **Big title behind you**.
+- **Behind the person:** any text, card or sticker can sit behind the person: Google's MediaPipe selfie segmenter (loaded from a CDN the first time, then cached) cuts the person out of each frame on the device, the layer is drawn, then the person goes back on top. Works in the preview and the export.
+- **Pin to a word:** any layer can be pinned to a caption word; it starts on that word and follows it when the clip is trimmed, sped up or has its silences cut (hidden if the word is trimmed away).
 - **On the preview:** tap text or a sticker to select it, drag to move, drag the ↻ handle to resize and turn (or scroll / pinch); Delete removes it, Esc deselects. Up to 24 per reel.
-- **FX:** transitions for the intro, between cuts (the jump cuts from Cut the silences, and optionally the video's own scene changes) and the outro: fade, flash, zoom, whip, glitch, shake, spin, pixel; length 0.15-1 s; preview buttons.
+- **Storyboard** (header button): a table of every line said in the clip (time, words, what's on screen: hook, intro, colour, layers, cut transitions). **Suggest a plan** proposes ideas per line (a hook, tool labels on names like FFmpeg or yt-dlp, emoji on feeling words, a prompt bar on instructions, big numbers, one line behind you): tap to skip any, then add them all. Each row also has **+ Add…**, chips can be removed, and **Copy as text** gives the plan to paste anywhere. Rule-based, on the device, no AI.
+- **FX:** a **3×3 wall** intro (the shot shrinks into the centre of a wall of 8 other moments from the video, which pop in one by one, then pushes back in), transitions for the intro, between cuts (the jump cuts from Cut the silences, and optionally the video's own scene changes) and the outro: fade, flash, zoom, whip, glitch, shake, spin, pixel; length 0.15-1 s; preview buttons.
 - **Sound:** speed 0.75-2×, cut the silences (gentle → snappy), video volume, background music from the device with ducking.
 - **Post:** suggested caption + hashtags (from the clip's words and the brand kit), copy; status; export (Full HD or 720p, MP4 where the browser supports it, else WebM; optional .srt). After export: preview, download again, share (phones), copy caption, next clip. Confetti and badges.
 
@@ -64,15 +69,16 @@ What this project uses besides its own code. Generated by `APP_MAKER/tools/libra
 
 | Name | How it gets in | Used here for |
 |---|---|---|
+| [MediaPipe vision tasks](https://ai.google.dev/edge/mediapipe/solutions/guide) 0.10.14 | Loaded from a CDN | Selfie Segmenter: cuts the person out so text can sit behind them |
 | [Transformers.js](https://huggingface.co/docs/transformers.js) 3.0.2 | Loaded from a CDN | speech-to-text for the reel captions |
 | [Whisper speech models](https://huggingface.co/onnx-community) | Loaded from a CDN | whisper-tiny, whisper-tiny.en |
-| [Google Fonts](https://fonts.google.com) | Loaded from a CDN | Anton, Bangers, Bricolage Grotesque, Bungee, DM Sans, Lilita One, Luckiest Guy, Pacifico, Permanent Marker, Rubik Mono One, Titan One |
+| [Google Fonts](https://fonts.google.com) | Loaded from a CDN | Anton, Bangers, Bricolage Grotesque, Bungee, DM Sans, Lilita One, Luckiest Guy, Pacifico, Permanent Marker, Playfair Display, Rubik Mono One, Titan One |
 
 **Built into the browser:** Canvas 2D, Web Audio API, MediaRecorder, Web Share, localStorage, Clipboard, File downloads (Blob), Web Workers.
 
 **Anvil platform:** Anvil, Anvil Data Tables, Anvil JS bridge (anvil.js), Anvil Users.
 
-**Build and test tools (not shipped):** Node.js, Headless Chrome (DevTools Protocol), PyYAML.
+**Build and test tools (not shipped):** Node.js, PyYAML, Headless Chrome (DevTools Protocol).
 
 <!-- libraries:end -->
 
@@ -92,8 +98,9 @@ python tools/deploy.py --push "Message"          # deploy: commit + push to GitH
 
 ```
 web/pages/_a_core.html    RS helpers, icons, default style + looks, RS.db (server / guest storage), RS.vault (OPFS), RS.media
-web/pages/_b_smart.html   analysis, reel finder, captions, subtitles, chapters, on-device transcription, post copy
-web/pages/_c_engine.html  the renderer (one frame), live preview player, exporter (MediaRecorder), .srt
+web/pages/_b_smart.html   analysis, reel finder, captions, subtitles, chapters, on-device transcription, post copy, storyboard ideas
+web/pages/_c_engine.html  the renderer (one frame: layouts incl. corner card, colour grades, 3x3 wall, person cut-out,
+                          cards), live preview player, exporter (MediaRecorder), .srt
 web/pages/*.html          landing, home (Studio), project, clip (editor), brand, templates, profile, admin, auth
 server_code/              Studio.py (projects, clips, exports, stats, badges, import), Brand.py (brand kit, templates),
                           Styles.py (style cleaning), Admin.py, DemoData.py, Accounts.py, Feedback.py, common.py, legal_server.py

@@ -532,13 +532,20 @@
   /* ------------------------------------------------------------------ styles: defaults + built-in looks
      Keep in step with SPEC in server_code/Styles.py. */
   RS.DEFAULT_STYLE = {
-    look: 'pop-star', aspect: '9:16', layout: 'fill', zoom: 1, fx: 0.5, fy: 0.5, zoom2: 1, fx2: 0.5, fy2: 0.5, split: 0.5, bg: '#FF3D8B', punch: true,
-    captions: true, capStyle: 'pop', capFont: 'Anton', capSize: 1, capPos: 0.72, capWords: 3, capUpper: true, capEmoji: true, hl: '#C6F432', capColor: '#FFFFFF',
+    look: 'creator', aspect: '9:16', layout: 'fill', zoom: 1, fx: 0.5, fy: 0.5, zoom2: 1, fx2: 0.5, fy2: 0.5, split: 0.5, bg: '#FF3D8B', punch: false,
+    captions: true, capStyle: 'clean', capFont: 'Bricolage Grotesque', capSize: 1, capPos: 0.72, capWords: 3, capUpper: false, capEmoji: false, hl: '#C6F432', capColor: '#FFFFFF',
     hook: '', hookSecs: 3, hookBg: '#C6F432', part: '', handle: '', handlePos: 'tr', progress: true, progColor: '#FF3D8B', cta: false, ctaText: 'Follow for part 2 👀',
     speed: 1, cutSilence: false, silence: 0.5, vol: 1, musicName: '', musicVol: 0.25, duck: true, quality: '1080',
-    transIn: 'fade', transOut: 'fade', transCut: 'none', transLen: 0.4, transScenes: false, layers: []
+    transIn: 'fade', transOut: 'fade', transCut: 'none', transLen: 0.4, transScenes: false, layers: [],
+    grade: 'none', gradeAmt: 0.75, gradeWipe: false, pipPos: 'tl', pipSize: 0.38, pipName: '', wall: false
   };
-  RS.FONTS = ['Anton', 'Bangers', 'Luckiest Guy', 'Bungee', 'Titan One', 'Lilita One', 'Rubik Mono One', 'Permanent Marker', 'Pacifico', 'Bricolage Grotesque', 'DM Sans'];
+  RS.FONTS = ['Anton', 'Bangers', 'Luckiest Guy', 'Bungee', 'Titan One', 'Lilita One', 'Rubik Mono One', 'Permanent Marker', 'Pacifico', 'Bricolage Grotesque', 'DM Sans', 'Playfair Display'];
+  /* Colour grades (style.grade), drawn with blend modes in RS.grade (_c_engine.html). Keep in step with GRADES in Styles.py. */
+  RS.GRADES = [['none', '🚫 None'], ['warm', '🌅 Warm'], ['moody', '🌑 Moody'], ['cool', '🧊 Cool'], ['teal', '🎬 Teal & orange'], ['vivid', '🌈 Vivid'], ['film', '🎞️ Film'], ['bw', '⚫ Black & white']];
+  /* Cards on the reel (layer t: 'card'): a tool label, a GitHub-style repo card, a prompt bar that types itself. */
+  RS.CARDS = [{ key: 'label', name: 'Tool label', v: 'FFmpeg', sub: '', icon: '🎬', fill: '#22C55E' },
+    { key: 'repo', name: 'Repo card', v: 'yt-dlp/yt-dlp', sub: 'A feature-rich command-line audio/video downloader', icon: '📦', fill: '#2F81F7' },
+    { key: 'prompt', name: 'Prompt bar', v: 'Make it moody and the colours go dark', sub: '', icon: '', fill: '#D97757' }];
   RS.TRANS = [['none', '🚫 None'], ['fade', '🌑 Fade'], ['flash', '⚡ Flash'], ['zoom', '🔍 Zoom'], ['whip', '💨 Whip'], ['glitch', '📺 Glitch'],
     ['shake', '🫨 Shake'], ['spin', '🌀 Spin'], ['pixel', '👾 Pixel']];
   /* Text and stickers on the reel (style.layers). Keep the lists in step with server_code/Styles.py. */
@@ -550,7 +557,8 @@
     { key: 'glow', name: 'Glow', font: 'Lilita One', fill: '#FFFFFF', line: '#22E6D0' },
     { key: 'sticker', name: 'Sticker', font: 'Bungee', fill: '#1A1033', line: '#C6F432' },
     { key: 'marker', name: 'Marker', font: 'Permanent Marker', fill: '#1A1033', line: '#FFE14D' },
-    { key: 'plain', name: 'Soft', font: 'Pacifico', fill: '#FFFFFF', line: '#000000' }
+    { key: 'plain', name: 'Soft', font: 'Pacifico', fill: '#FFFFFF', line: '#000000' },
+    { key: 'magazine', name: 'Magazine', font: 'Playfair Display', fill: '#FFFFFF', line: '#FFFFFF' }
   ];
   RS.ANIMS = [['none', 'None'], ['pop', '💥 Pop'], ['fade', '🌫️ Fade'], ['slide', '⬆️ Slide up'], ['drop', '⬇️ Drop'], ['zoom', '🔍 Zoom'], ['spin', '🌀 Spin'], ['type', '⌨️ Type']];
   RS.LOOPS = [['none', 'Still'], ['wiggle', '〰️ Wiggle'], ['float', '🎈 Float'], ['pulse', '💓 Pulse'], ['shake', '🫨 Shake'], ['spin', '🔄 Spin']];
@@ -568,10 +576,14 @@
   ];
   RS.SHAPES = [['arrow', '➜ Arrow'], ['ring', '⭕ Circle it'], ['underline', '〰️ Underline'], ['sparkles', '✨ Sparkles'], ['heart', '❤️ Heart'], ['star', '⭐ Star']];
   RS.newLayer = function (t, v, extra) {
-    return Object.assign({ id: Math.random().toString(36).slice(2, 10), t: t, v: v, x: 0.5, y: t === 'text' ? 0.3 : 0.42, size: 1, rot: t === 'text' ? -3 : 0,
-      s: 0, e: 3, all: false, anim: 'pop', loop: t === 'text' ? 'none' : 'wiggle', font: 'Anton', ts: 'outline', fill: '#FFFFFF', line: '#000000', shape: 'pill', upper: t === 'text' }, extra || {});
+    var card = t === 'card';
+    return Object.assign({ id: Math.random().toString(36).slice(2, 10), t: t, v: v, x: 0.5, y: t === 'text' ? 0.3 : card ? 0.2 : 0.42, size: 1, rot: t === 'text' ? -3 : 0,
+      s: 0, e: 3, all: false, anim: 'pop', loop: t === 'text' || card ? 'none' : 'wiggle', font: 'Anton', ts: 'outline', fill: '#FFFFFF', line: '#000000', shape: 'pill', upper: t === 'text',
+      behind: false }, extra || {});
   };
   RS.LOOKS = [
+    { key: 'creator', name: 'Creator Clean', emoji: '🤍', style: { layout: 'fill', capStyle: 'clean', capFont: 'Bricolage Grotesque', capWords: 3, capUpper: false, capEmoji: false, punch: false, progress: true, progColor: '#FFFFFF', grade: 'none', transIn: 'fade', transCut: 'whip' } },
+    { key: 'moody', name: 'Moody Talk', emoji: '🌑', style: { layout: 'fill', capStyle: 'clean', capFont: 'DM Sans', capWords: 4, capUpper: false, capEmoji: false, punch: false, progress: false, grade: 'moody', gradeAmt: 0.8, transIn: 'fade', transCut: 'whip' } },
     { key: 'pop-star', name: 'Pop Star', emoji: '🌟', style: { layout: 'fill', capStyle: 'pop', capFont: 'Anton', hl: '#C6F432', capWords: 3, capUpper: true, progress: true, progColor: '#FF3D8B', punch: true, transCut: 'zoom' } },
     { key: 'comic', name: 'Comic Chaos', emoji: '💥', style: { layout: 'fill', capStyle: 'comic', capFont: 'Luckiest Guy', hl: '#FFE14D', capWords: 2, capUpper: true, punch: true, progColor: '#FFE14D', transIn: 'zoom', transCut: 'flash' } },
     { key: 'karaoke', name: 'Karaoke', emoji: '🎤', style: { layout: 'fill', capStyle: 'karaoke', capFont: 'Anton', hl: '#FF3D8B', capWords: 4, capUpper: true } },
@@ -581,9 +593,9 @@
     { key: 'clean', name: 'Clean & Calm', emoji: '🫧', style: { layout: 'fit', capStyle: 'minimal', capFont: 'DM Sans', capWords: 5, capUpper: false, progress: false, punch: false, capEmoji: false, transCut: 'fade' } }
   ];
   RS.KIT_KEYS = ['look', 'aspect', 'layout', 'bg', 'punch', 'captions', 'capStyle', 'capFont', 'capSize', 'capPos', 'capWords', 'capUpper', 'capEmoji', 'hl', 'capColor',
-    'hookSecs', 'hookBg', 'handle', 'handlePos', 'progress', 'progColor', 'cta', 'ctaText', 'cutSilence', 'transIn', 'transOut', 'transCut', 'transLen', 'quality'];
+    'hookSecs', 'hookBg', 'handle', 'handlePos', 'progress', 'progColor', 'cta', 'ctaText', 'cutSilence', 'transIn', 'transOut', 'transCut', 'transLen', 'quality', 'grade', 'gradeAmt'];
   RS.LOOK_KEYS = ['layout', 'split', 'bg', 'punch', 'captions', 'capStyle', 'capFont', 'capSize', 'capPos', 'capWords', 'capUpper', 'capEmoji', 'hl', 'capColor',
-    'hookBg', 'progress', 'progColor', 'cta', 'ctaText', 'fy2', 'transIn', 'transOut', 'transCut'];
+    'hookBg', 'progress', 'progColor', 'cta', 'ctaText', 'fy2', 'transIn', 'transOut', 'transCut', 'grade', 'gradeAmt'];
   RS.kit = {};  // the signed-in person's (or guest's) brand kit, set by the studio and brand pages
   RS.styleFor = function (over) {
     var st = Object.assign({}, RS.DEFAULT_STYLE);
@@ -1318,6 +1330,69 @@
     var keep = (old || []).filter(function (w) { return !ranges.some(function (r) { return w[0] >= r[0] - 0.3 && w[0] < r[1] + 0.3; }); });
     return keep.concat(fresh).sort(function (a, b) { return a[0] - b[0]; });
   };
+
+  /* ------------------------------------------------------------------ storyboard ideas
+     RS.suggestBoard(rows, style, plan): what could go on screen for each caption line (rows = RS.cues(...)). Simple rules,
+     no AI and nothing leaves the device: a hook if there's none, tool labels on names (FFmpeg, yt-dlp, GitHub...), emoji
+     on feeling words, a prompt bar on lines that give an instruction ("Ask...", "Make..."), big numbers as titles, and
+     one line as a big title behind the person. Each idea: {row, kind, label, at, word, len, line} or {kind: 'hook', hook}. */
+  var NOT_TOOLS = ('i im id ive ill the a an and but so or if then this that these those it its you your youre we they he she my our what when where why how ' +
+    'who okay ok yes no oh well just now here there watch lets dont personally exactly also because before after today tomorrow monday tuesday wednesday ' +
+    'thursday friday saturday sunday january february march april may june july august september october november december hey hi thanks').split(' ');
+  var DO_VERBS = /^(ask|tell|make|give|use|write|create|draw|add|put|cut|turn|try|build|let|have|get|shrink|pop|grab|download|open|pick|start|stop|go)$/i;
+  function bare(w) { return String(w || '').replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/gu, ''); }
+  RS.suggestBoard = function (rows, st, plan) {
+    var out = [], seen = {}, n = { label: 0, emoji: 0, prompt: 0, title: 0 }, layers = (st && st.layers) || [];
+    function taken(at) { return layers.some(function (L) { return L.at != null && Math.abs(L.at - at) < 0.05; }); }
+    if (!rows.length) return out;
+    if (st && !st.hook) {
+      var first = rows[0].text.split(/\s+/), hook = first.length <= 9 ? rows[0].text : first.slice(0, 7).join(' ') + '…';
+      out.push({ row: 0, kind: 'hook', hook: hook.slice(0, 90), label: 'Hook: “' + hook.slice(0, 40) + '”' });
+    }
+    rows.forEach(function (r, i) {
+      var ws = r.words, lineIdeas = 0;
+      // a tool or brand name: CamelCase, a dash between letters, ALL CAPS, or Capitalised in the middle of a sentence
+      for (var k = 0; k < ws.length && n.label < 4; k++) {
+        var raw = String(ws[k][2]), w = bare(raw), lo = w.toLowerCase().replace(/['’]/g, '');
+        if (w.length < 3 || seen[lo] || NOT_TOOLS.indexOf(lo) >= 0 || taken(ws[k][0])) continue;
+        var prev = k ? String(ws[k - 1][2]) : (i ? rows[i - 1].text : '.');
+        var startOfSentence = /[.!?…]$/.test(prev) || (!k && !i);
+        var tool = /[a-z][A-Z]/.test(w) || /^\p{L}+-\p{L}+$/u.test(w) && /[a-z]/.test(w) && w.length <= 12 || /^[A-Z]{3,8}$/.test(w) || (/^[A-Z][a-z]+$/.test(w) && !startOfSentence);
+        if (!tool) continue;
+        seen[lo] = 1; n.label++; lineIdeas++;
+        out.push({ row: i, kind: 'label', at: ws[k][0], word: w, len: 2.2, label: '🏷️ Label “' + w + '”' });
+        break;
+      }
+      // feeling words get an emoji (only if captions aren't adding their own)
+      if (!(st && st.capEmoji) && n.emoji < 4 && lineIdeas < 2) {
+        for (var j = 0; j < ws.length; j++) {
+          var em = RS.emojiFor(ws[j][2]);
+          if (em && !taken(ws[j][0])) { n.emoji++; lineIdeas++; out.push({ row: i, kind: 'emoji', at: ws[j][0], word: bare(ws[j][2]), len: 1.6, label: em + ' on “' + bare(ws[j][2]) + '”' }); break; }
+        }
+      }
+      // an instruction ("Ask Claude to...", "Make it moody...") becomes a prompt bar that types itself
+      if (n.prompt < 2 && ws.length >= 4 && DO_VERBS.test(bare(ws[0][2])) && !taken(ws[0][0])) {
+        n.prompt++; lineIdeas++;
+        out.push({ row: i, kind: 'prompt', at: ws[0][0], word: bare(ws[0][2]), len: Math.min(4.5, Math.max(2.5, r.e - r.s + 0.8)), line: r.text.replace(/[.,!?]+$/, ''), label: '⌨️ Prompt bar with this line' });
+      }
+      // numbers ("15%", "97 bucks", "3x3") pop up as a big title
+      if (n.title < 2 && lineIdeas < 2) {
+        for (var q = 0; q < ws.length; q++) {
+          var nw = bare(ws[q][2]);
+          if (/\d/.test(nw) && !taken(ws[q][0])) { n.title++; out.push({ row: i, kind: 'title', at: ws[q][0], word: String(ws[q][2]).replace(/[.,!?;:]+$/, ''), len: 1.6, label: '✏️ Big “' + nw + '”' }); break; }
+        }
+      }
+    });
+    // one strong short line goes behind the person (an exclamation or question, else the shortest full line)
+    var cand = rows.map(function (r, i) { return { r: r, i: i, n: r.words.length }; }).filter(function (c) { return c.n >= 2 && c.n <= 7; });
+    var best = cand.filter(function (c) { return /[!?]$/.test(c.r.text); })[0] || cand.sort(function (a, b) { return a.n - b.n; })[0];
+    if (best && !taken(best.r.words[0][0]) && !layers.some(function (L) { return L.behind; })) {
+      out.push({ row: best.i, kind: 'behind', at: best.r.words[0][0], word: bare(best.r.words[0][2]), len: Math.min(3, Math.max(1.5, best.r.e - best.r.s + 0.3)),
+        line: best.r.text.replace(/[.,!?…]+$/, ''), label: '🧍 This line behind you' });
+    }
+    out.sort(function (a, b) { return a.row - b.row; });
+    return out;
+  };
 })();
 
 /* ===== _c_engine.html ===== */
@@ -1335,9 +1410,9 @@
     'Luckiest Guy': '400 {s}px "Luckiest Guy", "Bangers", sans-serif', 'Bungee': '400 {s}px "Bungee", Impact, sans-serif',
     'Titan One': '400 {s}px "Titan One", "Anton", sans-serif', 'Lilita One': '400 {s}px "Lilita One", "Anton", sans-serif',
     'Permanent Marker': '400 {s}px "Permanent Marker", "Comic Sans MS", cursive', 'Pacifico': '400 {s}px "Pacifico", cursive',
-    'Rubik Mono One': '400 {s}px "Rubik Mono One", Impact, sans-serif' };
+    'Rubik Mono One': '400 {s}px "Rubik Mono One", Impact, sans-serif', 'Playfair Display': '900 {s}px "Playfair Display", Georgia, serif' };
   RS.FONT_SCALE = { 'Anton': 1, 'Bangers': 1.1, 'Bricolage Grotesque': 0.86, 'DM Sans': 0.82, 'Luckiest Guy': 0.9, 'Bungee': 0.74,
-    'Titan One': 0.86, 'Lilita One': 0.98, 'Permanent Marker': 0.9, 'Pacifico': 0.8, 'Rubik Mono One': 0.66 };
+    'Titan One': 0.86, 'Lilita One': 0.98, 'Permanent Marker': 0.9, 'Pacifico': 0.8, 'Rubik Mono One': 0.66, 'Playfair Display': 0.84 };
   var fontsReady = null;
   RS.fontsReady = function () {
     if (!fontsReady) fontsReady = document.fonts ? Promise.all(Object.keys(RS.FONT_CSS).map(function (k) { return RS.FONT_CSS[k].split(', ')[0].replace('{s}', '60'); })
@@ -1428,11 +1503,16 @@
 
   /* ------------------------------------------------------------------ one frame */
   RS.render = function (g, W, H, src, plan, tSrc, tOut, opt) {
-    var st = plan.st, u = Math.min(W, H) / 1080;
+    opt = opt || {};
+    var st = plan.st, u = Math.min(W, H) / 1080, vr = null;  // vr: where the video sits (the colour grade stays inside it)
     var sw = src && (src.videoWidth || src.width), sh = src && (src.videoHeight || src.height);
+    if (opt.boxes) opt.boxes.length = 0;
     g.save();
     g.fillStyle = '#000'; g.fillRect(0, 0, W, H);
-    if (sw && sh) {
+    if (sw && sh && st.layout === 'pip') {
+      cover(g, src, sw, sh, 0, 0, W, H, st.zoom * punchAt(plan, tSrc), st.fx, st.fy);
+      drawPip(g, W, H, u, src, sw, sh, plan);
+    } else if (sw && sh) {
       var pz = punchAt(plan, tSrc), z = st.zoom * pz;
       if (st.layout === 'split') {
         var h1 = Math.round(H * st.split);
@@ -1451,6 +1531,7 @@
         var sc = Math.min(maxW / sw, maxH / sh), fw = sw * sc, fh = sh * sc;
         var fx0 = (W - fw) / 2, fy0 = (H - fh) / 2 - (st.layout === 'framed' ? H * 0.02 : 0);
         if (st.layout === 'framed') {
+          vr = { x: fx0, y: fy0, w: fw, h: fh };
           g.fillStyle = INK; rr(g, fx0 + 14 * u, fy0 + 14 * u, fw, fh, 30 * u); g.fill();
           g.save(); rr(g, fx0, fy0, fw, fh, 30 * u); g.clip(); cover(g, src, sw, sh, fx0, fy0, fw, fh, z, st.fx, st.fy); g.restore();
           g.lineWidth = 8 * u; g.strokeStyle = INK; rr(g, fx0, fy0, fw, fh, 30 * u); g.stroke();
@@ -1459,10 +1540,37 @@
         cover(g, src, sw, sh, 0, 0, W, H, z, st.fx, st.fy);
       }
     }
-    var still = !!(opt && opt.noFade), tr = still ? null : transAt(plan, tOut);
-    if (tr) moveFrame(g, W, H, u, tr, tOut);
+    var still = !!opt.noFade;
+    if (sw && sh && st.grade && st.grade !== 'none' && st.gradeAmt > 0) {
+      // colour grade; with gradeWipe a before/after slider sweeps across in the first seconds
+      var wp = st.gradeWipe && !still ? wipeAt(tOut) : 1;
+      if (wp < 1) { if (wipeCv.width !== W || wipeCv.height !== H) { wipeCv.width = W; wipeCv.height = H; } wipeCv.getContext('2d').drawImage(g.canvas, 0, 0); }
+      RS.grade(g, st.grade, st.gradeAmt, vr || { x: 0, y: 0, w: W, h: H });
+      if (wp < 1) {
+        var lx = Math.round(W * wp);
+        if (lx < W) g.drawImage(wipeCv, lx, 0, W - lx, H, lx, 0, W - lx, H);
+        if (wp > 0) {
+          g.save(); g.fillStyle = '#FFFFFF'; g.shadowColor = 'rgba(0,0,0,.5)'; g.shadowBlur = 10 * u; g.fillRect(lx - 3 * u, 0, 6 * u, H);
+          g.beginPath(); g.arc(lx, H * 0.52, 36 * u, 0, 7); g.fill(); g.shadowBlur = 0;
+          g.fillStyle = INK; g.font = '700 ' + Math.round(34 * u) + 'px "DM Sans", sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('‹ ›', lx, H * 0.52 + 1 * u);
+          g.restore();
+        }
+      }
+    }
+    var tr = still ? null : transAt(plan, tOut), walling = !still && wallOn(plan, tOut);
+    if (walling) drawWall(g, W, H, u, plan, tOut);
+    else if (tr) moveFrame(g, W, H, u, tr, tOut);
+    var layers = st.layers || [], back = layers.some(function (L) { return L.behind && (L.id === opt.selected || inSpan(layerSpan(L, plan), tOut)); });
+    if (back) {
+      // text behind the person: cut the person out of this frame, draw the "behind" layers, put the person back on top
+      var key = [W, H, tSrc.toFixed(3), st.layout, st.zoom, st.fx, st.fy, st.zoom2, st.fx2, st.fy2, st.grade, st.gradeAmt, tr || walling ? tOut.toFixed(3) : ''].join('|');
+      var person = sw && sh ? RS.person.cutout(g.canvas, W, H, key) : null;
+      drawLayers(g, W, H, u, plan, tOut, opt, 'behind');
+      if (person) g.drawImage(person, 0, 0);
+    }
     if (st.captions && plan.cues.length) drawCaptions(g, W, H, u, plan, tSrc);
-    if (st.layers && st.layers.length) drawLayers(g, W, H, u, plan, tOut, opt || {});
+    if (layers.length) drawLayers(g, W, H, u, plan, tOut, opt, back ? 'front' : 'all');
+    if (opt.selected) drawSelection(g, u, opt);
     drawOverlays(g, W, H, u, plan, tOut, still);
     if (tr && (tr.k === 'fade' || tr.k === 'flash')) {
       g.fillStyle = tr.k === 'fade' ? 'rgba(0,0,0,' + RS.clamp(tr.a, 0, 1) + ')' : 'rgba(255,255,255,' + RS.clamp(Math.pow(tr.a, 1.4) * 0.95, 0, 1) + ')';
@@ -1477,7 +1585,7 @@
      the others move the picture (copied to a scratch canvas) before captions and stickers go on top. */
   function transAt(plan, t) {
     var st = plan.st, L = st.transLen || 0.4, D = plan.outDur;
-    if (st.transIn && st.transIn !== 'none' && t < L) return { k: st.transIn, a: 1 - t / L, dir: 1 };
+    if (st.transIn && st.transIn !== 'none' && t < L && !wallOn(plan, 0)) return { k: st.transIn, a: 1 - t / L, dir: 1 };
     if (st.transOut && st.transOut !== 'none' && D - t < L) return { k: st.transOut, a: 1 - (D - t) / L, dir: -1 };
     if (st.transCut && st.transCut !== 'none' && plan.joins) {
       for (var i = 0; i < plan.joins.length; i++) {
@@ -1488,7 +1596,167 @@
     return null;
   }
   RS.transAt = transAt;
-  var snap = document.createElement('canvas'), tiny = document.createElement('canvas');
+  var snap = document.createElement('canvas'), tiny = document.createElement('canvas'), wipeCv = document.createElement('canvas'), gradeCv = document.createElement('canvas');
+
+  /* ------------------------------------------------------------------ colour grades (style.grade, strength gradeAmt)
+     Canvas blend modes only, so it's fast and works in every browser: multiply pulls the highlights down, screen lifts
+     the blacks, "saturation" with grey takes colour out (with a pure colour it adds colour), soft-light tints, and
+     soft-light of the picture onto itself adds contrast. r = the rectangle to grade. */
+  RS.grade = function (g, k, amt, r) {
+    var a = RS.clamp(amt == null ? 0.75 : amt, 0, 1);
+    if (!k || k === 'none' || !a) return;
+    var x = Math.round(r.x), y = Math.round(r.y), w = Math.max(1, Math.round(r.w)), h = Math.max(1, Math.round(r.h));
+    g.save(); g.beginPath(); g.rect(x, y, w, h); g.clip();
+    function fill(op, color, alpha) { g.globalCompositeOperation = op; g.globalAlpha = RS.clamp(alpha * a, 0, 1); g.fillStyle = color; g.fillRect(x, y, w, h); }
+    function contrast(alpha) {
+      if (gradeCv.width !== w || gradeCv.height !== h) { gradeCv.width = w; gradeCv.height = h; }
+      var cg = gradeCv.getContext('2d'); cg.globalCompositeOperation = 'copy'; cg.drawImage(g.canvas, x, y, w, h, 0, 0, w, h);
+      g.globalCompositeOperation = 'soft-light'; g.globalAlpha = RS.clamp(alpha * a, 0, 1); g.drawImage(gradeCv, x, y);
+    }
+    function vignette(strength) {
+      var cx = x + w / 2, cy = y + h / 2, R = Math.hypot(w, h) / 2, gr = g.createRadialGradient(cx, cy, R * 0.38, cx, cy, R);
+      gr.addColorStop(0, 'rgba(0,0,0,0)'); gr.addColorStop(1, 'rgba(0,0,0,' + strength + ')');
+      g.globalCompositeOperation = 'source-over'; g.globalAlpha = a; g.fillStyle = gr; g.fillRect(x, y, w, h);
+    }
+    if (k === 'warm') { fill('soft-light', '#FF8A2B', 0.6); fill('multiply', '#FFEAD4', 0.7); fill('screen', '#241200', 0.6); }
+    else if (k === 'moody') { fill('multiply', '#CFCFD6', 1); fill('screen', '#1C1C22', 1); fill('saturation', '#808080', 0.2); vignette(0.6); }  // highlights down, blacks up, saturation -15-20%, soft vignette
+    else if (k === 'cool') { fill('soft-light', '#2F7DFF', 0.5); fill('saturation', '#808080', 0.1); fill('screen', '#000C1A', 0.6); }
+    else if (k === 'teal') { fill('soft-light', '#00897B', 0.45); fill('overlay', '#FF8C42', 0.2); contrast(0.3); fill('saturation', '#FF0000', 0.1); }
+    else if (k === 'vivid') { contrast(0.55); fill('saturation', '#FF0000', 0.22); }
+    else if (k === 'film') { fill('screen', '#2A2218', 1); fill('multiply', '#F4E6D2', 1); fill('saturation', '#808080', 0.28); vignette(0.38); }
+    else if (k === 'bw') { fill('saturation', '#808080', 1); contrast(0.45); }
+    g.restore();
+  };
+  /* A small preview of a grade on the current frame (the editor's colour picker). */
+  RS.gradeThumb = function (cv, src, k, amt, st) {
+    cv.width = 108; cv.height = 144;
+    var g = cv.getContext('2d'), sw = src.videoWidth || src.width, sh = src.videoHeight || src.height;
+    g.fillStyle = '#000'; g.fillRect(0, 0, 108, 144);
+    if (sw && sh) cover(g, src, sw, sh, 0, 0, 108, 144, (st && st.zoom) || 1, st ? st.fx : 0.5, st ? st.fy : 0.5);
+    RS.grade(g, k, amt, { x: 0, y: 0, w: 108, h: 144 });
+  };
+  function wipeAt(t) { return t < 0.4 ? 0 : t > 1.9 ? 1 : ease((t - 0.4) / 1.5); }
+
+  /* ------------------------------------------------------------------ picture in picture (layout 'pip')
+     The main shot fills the frame; a rounded card in a corner shows a second crop of the same video (zoom2/fx2/fy2),
+     or another video from this device (plan.pipSrc: a reaction or a face cam, played along with the reel). */
+  RS.pipRect = function (st, W, H) {
+    var u = Math.min(W, H) / 1080, w = W * (st.pipSize || 0.38), h = Math.min(H * 0.6, w * 1.4), m = 40 * u;
+    var right = st.pipPos === 'tr' || st.pipPos === 'br', bottom = st.pipPos === 'bl' || st.pipPos === 'br';
+    return { x: right ? W - w - m : m, y: bottom ? H - h - m - 40 * u : m + 80 * u, w: w, h: h };
+  };
+  function drawPip(g, W, H, u, src, sw, sh, plan) {
+    var st = plan.st, r = RS.pipRect(st, W, H), pv = plan.pipSrc && plan.pipSrc.readyState >= 2 && plan.pipSrc.videoWidth ? plan.pipSrc : null;
+    var s2 = pv || src, w2 = pv ? pv.videoWidth : sw, h2 = pv ? pv.videoHeight : sh;
+    g.save();
+    g.shadowColor = 'rgba(0,0,0,.5)'; g.shadowBlur = 34 * u; g.shadowOffsetY = 10 * u; g.fillStyle = '#000'; rr(g, r.x, r.y, r.w, r.h, 30 * u); g.fill();
+    g.restore(); g.save();
+    rr(g, r.x, r.y, r.w, r.h, 30 * u); g.clip(); cover(g, s2, w2, h2, r.x, r.y, r.w, r.h, st.zoom2, st.fx2, st.fy2);
+    g.restore();
+    g.lineWidth = 5 * u; g.strokeStyle = 'rgba(255,255,255,.92)'; rr(g, r.x, r.y, r.w, r.h, 30 * u); g.stroke();
+  }
+
+  /* ------------------------------------------------------------------ the 3×3 wall intro (style.wall)
+     The shot shrinks into the centre tile of a 3×3 grid, 8 other moments (plan.wall: frames from the project's other
+     clips) pop in around it one after another, then the camera pushes back into the centre. Replaces the intro. */
+  var WALL_D = 1.9;
+  RS.WALL_D = WALL_D;
+  function wallOn(plan, t) { return !!(plan.st.wall && plan.wall && plan.wall.length && t < WALL_D); }
+  function drawWall(g, W, H, u, plan, t) {
+    if (snap.width !== W || snap.height !== H) { snap.width = W; snap.height = H; }
+    var sg = snap.getContext('2d'); sg.clearRect(0, 0, W, H); sg.drawImage(g.canvas, 0, 0);
+    var st = plan.st, gap = 14 * u, tw = (W - gap * 4) / 3, th = (H - gap * 4) / 3, full = W / tw;
+    var k = t < 0.35 ? full + (1 - full) * ease(t / 0.35) : t < 1.35 ? 1 : 1 + (full - 1) * Math.pow(RS.clamp((t - 1.35) / 0.55, 0, 1), 2.2);
+    var cx = gap * 2 + tw * 1.5, cy = gap * 2 + th * 1.5, order = [0, 1, 2, 5, 8, 7, 6, 3];
+    g.save(); g.setTransform(1, 0, 0, 1, 0, 0);
+    g.fillStyle = INK; g.fillRect(0, 0, W, H);
+    g.translate(W / 2, H / 2); g.scale(k, k); g.translate(-cx, -cy);
+    for (var i = 0; i < 9; i++) {
+      var x = gap + (i % 3) * (tw + gap), y = gap + Math.floor(i / 3) * (th + gap);
+      if (i === 4) { g.save(); rr(g, x, y, tw, th, 18 * u); g.clip(); g.drawImage(snap, x, y, tw, th); g.restore(); continue; }
+      var pos = order.indexOf(i), p = (t - 0.35 - pos * 0.075) / 0.28;
+      if (p <= 0) continue;
+      var fr = plan.wall[pos % plan.wall.length], sc = Math.max(0.01, popIn(p));
+      g.save(); g.translate(x + tw / 2, y + th / 2); g.scale(sc, sc); g.translate(-tw / 2, -th / 2);
+      rr(g, 0, 0, tw, th, 18 * u); g.clip(); cover(g, fr, fr.width, fr.height, 0, 0, tw, th, 1, st.fx, st.fy);
+      g.restore();
+    }
+    g.restore();
+  }
+  /* Frames for the wall: one picture per time, read from a separate <video> so the preview isn't disturbed. */
+  var wallCache = {};
+  RS.wallFrames = function (m, times) {
+    var key = m.url + '|' + times.map(function (t) { return t.toFixed(1); }).join(',');
+    if (wallCache[key]) return wallCache[key];
+    var p = RS.videoEl(m.url).then(function (v) {
+      var out = [];
+      return times.reduce(function (pr, t) {
+        return pr.then(function () { return RS.seek(v, t); }).then(function () {
+          var c = document.createElement('canvas'), w = 360; c.width = w; c.height = Math.max(1, Math.round(w * v.videoHeight / v.videoWidth));
+          c.getContext('2d').drawImage(v, 0, 0, c.width, c.height); out.push(c);
+        });
+      }, Promise.resolve()).then(function () { v.removeAttribute('src'); v.load(); return out; });
+    });
+    wallCache[key] = p; p.catch(function () { delete wallCache[key]; });
+    return p;
+  };
+
+  /* ------------------------------------------------------------------ the person cut-out (layers with behind: true)
+     Google's MediaPipe selfie segmenter, loaded from a CDN the first time someone puts text behind a person, runs
+     on this device (nothing is uploaded). cutout() returns a copy of the frame with only the person left. */
+  RS.person = (function () {
+    var self = { ready: false, failed: false }, seg = null, loading = null, lastTs = 0, cacheKey = null;
+    var BASE = 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14';
+    var MODEL = 'https://storage.googleapis.com/mediapipe-models/image_segmenter/selfie_segmenter/float16/latest/selfie_segmenter.tflite';
+    var small = document.createElement('canvas'), maskCv = document.createElement('canvas'), out = document.createElement('canvas');
+    self.load = function () {
+      if (seg) return Promise.resolve(true);
+      if (loading) return loading;
+      loading = import(BASE + '/vision_bundle.mjs').then(function (V) {
+        return V.FilesetResolver.forVisionTasks(BASE + '/wasm').then(function (files) {
+          function make(delegate) {
+            return V.ImageSegmenter.createFromOptions(files, { baseOptions: { modelAssetPath: MODEL, delegate: delegate }, runningMode: 'VIDEO',
+              outputCategoryMask: false, outputConfidenceMasks: true });
+          }
+          return make('GPU').catch(function () { return make('CPU'); });
+        });
+      }).then(function (s) { seg = s; self.ready = true; self.failed = false; return true; }, function (e) {
+        console.warn('person cut-out', e); self.failed = true; loading = null;
+        throw new Error('The person cut-out couldn\'t load. Check your connection and try again.');
+      });
+      return loading;
+    };
+    self.cutout = function (srcCanvas, W, H, key) {
+      if (!seg) return null;
+      if (out.width !== W || out.height !== H) { out.width = W; out.height = H; cacheKey = null; }
+      if (key !== cacheKey) {
+        var mw = 256, mh = Math.max(16, Math.round(256 * H / W)), ok = false;
+        if (small.width !== mw || small.height !== mh) { small.width = mw; small.height = mh; }
+        small.getContext('2d').drawImage(srcCanvas, 0, 0, W, H, 0, 0, mw, mh);
+        lastTs = Math.max(lastTs + 1, performance.now());
+        try {
+          seg.segmentForVideo(small, lastTs, function (res) {
+            var masks = res.confidenceMasks || [], m = masks[masks.length - 1];
+            if (!m) return;
+            var w = m.width, h = m.height, f = m.getAsFloat32Array();
+            if (maskCv.width !== w || maskCv.height !== h) { maskCv.width = w; maskCv.height = h; }
+            var mg = maskCv.getContext('2d'), id = mg.createImageData(w, h), d = id.data;
+            for (var i = 0, j = 0; i < f.length; i++, j += 4) { var a = (f[i] - 0.3) / 0.4; d[j] = d[j + 1] = d[j + 2] = 255; d[j + 3] = a <= 0 ? 0 : a >= 1 ? 255 : a * 255; }
+            mg.putImageData(id, 0, 0); ok = true;
+          });
+        } catch (e) { console.warn('cut-out', e); }
+        if (!ok) return null;
+        cacheKey = key;
+      }
+      var og = out.getContext('2d');
+      og.globalCompositeOperation = 'copy'; og.drawImage(srcCanvas, 0, 0, W, H, 0, 0, W, H);
+      og.globalCompositeOperation = 'destination-in'; og.imageSmoothingEnabled = true; og.imageSmoothingQuality = 'high';
+      og.drawImage(maskCv, 0, 0, W, H);
+      og.globalCompositeOperation = 'source-over';
+      return out;
+    };
+    return self;
+  })();
   function rnd(n) { var x = Math.sin(n * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); }
   function moveFrame(g, W, H, u, tr, t) {
     var k = tr.k, a = RS.clamp(tr.a, 0, 1), a2 = a * a;
@@ -1539,11 +1807,38 @@
     x = RS.clamp(x, 0, 1); var n = 7.5625, d = 2.75;
     if (x < 1 / d) return n * x * x; if (x < 2 / d) return n * (x -= 1.5 / d) * x + 0.75; if (x < 2.5 / d) return n * (x -= 2.25 / d) * x + 0.9375; return n * (x -= 2.625 / d) * x + 0.984375;
   }
-  function drawLayers(g, W, H, u, plan, t, opt) {
+  /* When a layer shows, in reel seconds. A layer pinned to a word (at = the word's second in the source video) follows
+     that word when the clip is trimmed, sped up or has its silences cut; it hides if the word is trimmed away. */
+  function layerSpan(L, plan) {
+    if (L.all) return [0, 1e9];
+    var s = L.s || 0, e = L.e || 0;
+    if (L.at != null && plan.clip && plan.segs) {
+      if (L.at < plan.clip.start - 0.01 || L.at > plan.clip.end) return [-1, -1];
+      var len = Math.max(0.3, e - s); s = RS.srcToOut(plan, L.at); e = s + len;
+    }
+    return [s, e];
+  }
+  function inSpan(sp, t) { return t >= sp[0] && t < sp[1]; }
+  RS.layerSpan = layerSpan;
+  function drawSelection(g, u, opt) {
+    var b = (opt.boxes || []).filter(function (x) { return x.id === opt.selected; })[0];
+    if (!b) return;
+    var bw = b.w, bh = b.h, pad = 14 * u;
+    g.save(); g.translate(b.x, b.y); g.rotate(b.rot);
+    g.setLineDash([14 * u, 10 * u]); g.lineWidth = 4 * u; g.strokeStyle = '#FFFFFF'; g.shadowColor = 'rgba(0,0,0,.6)'; g.shadowBlur = 6 * u;
+    g.strokeRect(-bw / 2 - pad, -bh / 2 - pad, bw + pad * 2, bh + pad * 2); g.setLineDash([]);
+    g.fillStyle = '#C6F432'; g.strokeStyle = INK; g.lineWidth = 5 * u; g.beginPath(); g.arc(bw / 2 + pad, bh / 2 + pad, 24 * u, 0, 7); g.fill(); g.stroke();
+    g.shadowBlur = 0; g.fillStyle = INK; g.font = '700 ' + Math.round(28 * u) + 'px "DM Sans", sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.fillText('↻', bw / 2 + pad, bh / 2 + pad + 1 * u);
+    g.restore();
+  }
+  /* which: 'all', 'behind' (only layers behind the person) or 'front' (the rest). */
+  function drawLayers(g, W, H, u, plan, t, opt, which) {
     var still = !!opt.noFade;
-    if (opt.boxes) opt.boxes.length = 0;
     plan.st.layers.forEach(function (L) {
-      var s = L.all ? 0 : (L.s || 0), e = L.all ? 1e9 : (L.e || 0);
+      if (which === 'behind' && !L.behind) return;
+      if (which === 'front' && L.behind) return;
+      var sp = layerSpan(L, plan), s = sp[0], e = sp[1];
       var vis = t >= s && t < e, sel = opt.selected === L.id, ghost = !vis && sel;
       if (!vis && !ghost) return;
       var local = Math.max(0, t - s), calm = still || ghost;
@@ -1556,7 +1851,7 @@
         else if (an === 'drop') y -= (1 - bounceOut(local / 0.7)) * H * 0.3;
         else if (an === 'zoom') { sc *= 1 + 1.6 * (1 - ease(local / 0.4)); alpha *= ease(local / 0.25); }
         else if (an === 'spin') { rot -= (1 - ease(local / 0.5)) * Math.PI * 1.5; sc *= Math.max(0.01, ease(local / 0.5)); }
-        else if (an === 'type') { if (L.t === 'text') chars = Math.floor(local / 0.05) + 1; else sc *= Math.max(0.01, popIn(local / 0.4)); }
+        else if (an === 'type') { if (L.t === 'text' || L.t === 'card') chars = Math.floor(local / (L.t === 'card' ? 0.035 : 0.05)) + 1; else sc *= Math.max(0.01, popIn(local / 0.4)); }
         var lp = L.loop || 'none';
         if (lp === 'wiggle') rot += Math.sin(local * 6) * 0.08;
         else if (lp === 'float') y += Math.sin(local * 2.4) * 14 * u;
@@ -1566,20 +1861,10 @@
         if (!L.all && e - t < 0.25) alpha *= RS.clamp((e - t) / 0.25, 0, 1);
       }
       g.save(); g.globalAlpha = RS.clamp(alpha, 0, 1); g.translate(x, y); g.rotate(rot); g.scale(sc, sc);
-      var box = drawLayerBody(g, L, u, W, chars);
+      var box = drawLayerBody(g, L, u, W, chars, calm ? 99 : local);
       g.restore();
       var bw = box.w * (L.size || 1), bh = box.h * (L.size || 1), br = (L.rot || 0) * Math.PI / 180;
       if (opt.boxes) opt.boxes.push({ id: L.id, x: L.x * W, y: L.y * H, w: bw, h: bh, rot: br });
-      if (sel) {
-        g.save(); g.translate(L.x * W, L.y * H); g.rotate(br);
-        var pad = 14 * u;
-        g.setLineDash([14 * u, 10 * u]); g.lineWidth = 4 * u; g.strokeStyle = '#FFFFFF'; g.shadowColor = 'rgba(0,0,0,.6)'; g.shadowBlur = 6 * u;
-        g.strokeRect(-bw / 2 - pad, -bh / 2 - pad, bw + pad * 2, bh + pad * 2); g.setLineDash([]);
-        g.fillStyle = '#C6F432'; g.strokeStyle = INK; g.lineWidth = 5 * u; g.beginPath(); g.arc(bw / 2 + pad, bh / 2 + pad, 24 * u, 0, 7); g.fill(); g.stroke();
-        g.shadowBlur = 0; g.fillStyle = INK; g.font = '700 ' + Math.round(28 * u) + 'px "DM Sans", sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
-        g.fillText('↻', bw / 2 + pad, bh / 2 + pad + 1 * u);
-        g.restore();
-      }
     });
   }
   function wrapLines(g, text, maxW) {
@@ -1592,10 +1877,11 @@
     });
     return out.slice(0, 5);
   }
-  function drawLayerBody(g, L, u, W, chars) {
+  function drawLayerBody(g, L, u, W, chars, lt) {
     if (L.t === 'emoji') return drawEmoji(g, L.v, u);
     if (L.t === 'badge') return drawBadge(g, L, u);
     if (L.t === 'shape') return drawShape(g, L, u);
+    if (L.t === 'card') return drawCard(g, L, u, chars, lt == null ? 99 : lt);
     var fname = L.font || 'Anton', fs = 92 * u * (RS.FONT_SCALE[fname] || 1), ts = L.ts || 'outline';
     g.font = font(fname, fs); g.textAlign = 'center'; g.textBaseline = 'middle'; g.lineJoin = 'round'; g.miterLimit = 2;
     var txt = L.upper ? String(L.v).toUpperCase() : String(L.v);
@@ -1631,10 +1917,96 @@
         g.lineWidth = fs * 0.035; g.strokeStyle = line; g.strokeText(l, 0, y); g.fillStyle = fill; g.fillText(l, 0, y);
       } else if (ts === 'plain') {
         g.save(); g.shadowColor = 'rgba(0,0,0,.6)'; g.shadowBlur = 16 * u; g.shadowOffsetY = 4 * u; g.fillStyle = fill; g.fillText(l, 0, y); g.restore();
+      } else if (ts === 'magazine') {
+        g.save(); g.shadowColor = 'rgba(0,0,0,.35)'; g.shadowBlur = 18 * u; g.shadowOffsetY = 3 * u; g.fillStyle = fill; g.fillText(l, 0, y); g.restore();
       } else { g.fillStyle = fill; g.fillText(l, 0, y); }
     });
+    if (ts === 'magazine') {
+      // a magazine masthead: issue line above, a thin rule and a barcode below
+      var kfs = Math.max(14 * u, fs * 0.17), kick = String(L.sub || magKicker()).toUpperCase();
+      g.save(); g.fillStyle = fill; g.globalAlpha *= 0.9;
+      g.font = '700 ' + Math.round(kfs) + 'px "DM Sans", system-ui, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
+      g.fillText(kick, 0, -bh / 2 - kfs * 0.9);
+      g.fillRect(-bw / 2, bh / 2 + kfs * 0.4, bw, Math.max(1, 2 * u));
+      var bx = bw / 2 - kfs * 6, by = bh / 2 + kfs * 1.0;
+      for (var i = 0; i < 28; i++) { var bwid = (rndBar(i) * 2.4 + 0.8) * u * 1.6; g.fillRect(bx + i * kfs * 0.21, by, bwid, kfs * 2); }
+      g.restore();
+      return { w: bw + fs * 0.2, h: bh + kfs * 6 };
+    }
     var extra = ts === 'sticker' ? fs * 1.0 : ts === 'double' ? fs * 0.4 : fs * 0.2;
     return { w: bw + extra, h: bh + (ts === 'sticker' ? fs * 0.52 : fs * 0.1) };
+  }
+  function rndBar(i) { var x = Math.sin(i * 91.7 + 13.1) * 43758.5; return x - Math.floor(x); }
+  function magKicker() {
+    var d = new Date(), m = ['JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE', 'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER'][d.getMonth()];
+    return 'No. 01 · ' + m + ' ' + d.getFullYear() + ' · The reel issue';
+  }
+
+  /* Cards: 'label' (an app-icon tile + a name, like a tool label), 'repo' (a GitHub-style repo card) and 'prompt'
+     (a chat prompt bar; with the "type" entrance it types itself out, then the cursor blinks). fill = accent colour. */
+  var EMOJI_FONT = '"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif';
+  function sans(weight, size) { return weight + ' ' + Math.round(size) + 'px "DM Sans", system-ui, sans-serif'; }
+  function drawCard(g, L, u, chars, lt) {
+    var kind = L.card || 'label', acc = L.fill || '#22C55E', title = String(L.v || ''), sub = String(L.sub || '');
+    var shown = chars != null ? title.slice(0, Math.max(0, chars)) : title;
+    g.textBaseline = 'middle'; g.lineJoin = 'round';
+    function shadowed(fn) { g.save(); g.shadowColor = 'rgba(0,0,0,.45)'; g.shadowBlur = 28 * u; g.shadowOffsetY = 8 * u; fn(); g.restore(); }
+    if (kind === 'label') {
+      var fs = 84 * u, tile = 132 * u, gap = 28 * u;
+      g.font = sans(700, fs);
+      var tw = g.measureText(title).width, w = tile + gap + tw, x0 = -w / 2;
+      shadowed(function () { g.fillStyle = '#121216'; rr(g, x0, -tile / 2, tile, tile, 32 * u); g.fill(); });
+      g.fillStyle = acc; rr(g, x0 + 16 * u, -tile / 2 + 16 * u, tile - 32 * u, tile - 32 * u, 20 * u); g.fill();
+      g.font = Math.round(tile * 0.46) + 'px ' + EMOJI_FONT; g.textAlign = 'center'; g.fillText(L.icon || '🧰', x0 + tile / 2, 4 * u);
+      g.font = sans(700, fs); g.textAlign = 'left';
+      g.save(); g.shadowColor = 'rgba(0,0,0,.6)'; g.shadowBlur = 18 * u; g.shadowOffsetY = 4 * u; g.fillStyle = '#FFFFFF'; g.fillText(shown, x0 + tile + gap, 4 * u); g.restore();
+      return { w: w + 24 * u, h: tile + 24 * u };
+    }
+    if (kind === 'repo') {
+      var cw = 860 * u, pad = 34 * u, fsT = 44 * u, fsS = 30 * u;
+      g.font = sans(400, fsS);
+      var dl = sub ? wrapLines(g, sub, cw - pad * 2).slice(0, 2) : [];
+      var ch = pad * 2 + fsT * 1.2 + (dl.length ? dl.length * fsS * 1.4 + 16 * u : 0) + 72 * u, cx0 = -cw / 2, cy0 = -ch / 2;
+      shadowed(function () { g.fillStyle = '#0D1117'; rr(g, cx0, cy0, cw, ch, 26 * u); g.fill(); });
+      g.lineWidth = 3 * u; g.strokeStyle = '#30363D'; rr(g, cx0, cy0, cw, ch, 26 * u); g.stroke();
+      var y = cy0 + pad + fsT * 0.6;
+      g.textAlign = 'left'; g.font = Math.round(fsT * 0.85) + 'px ' + EMOJI_FONT; g.fillText(L.icon || '📦', cx0 + pad, y);
+      var tx = cx0 + pad + fsT * 1.3;
+      g.font = sans(700, fsT); g.fillStyle = '#E6EDF3'; g.fillText(shown, tx, y);
+      var ttw = g.measureText(title).width; g.font = sans(600, 24 * u);
+      var pw = g.measureText('Public').width + 30 * u;
+      if (tx + ttw + 22 * u + pw < cx0 + cw - pad) { g.strokeStyle = '#30363D'; rr(g, tx + ttw + 22 * u, y - 21 * u, pw, 42 * u, 21 * u); g.stroke(); g.fillStyle = '#8B949E'; g.fillText('Public', tx + ttw + 37 * u, y + 1 * u); }
+      y += fsT * 0.6 + 16 * u;
+      g.font = sans(400, fsS); g.fillStyle = '#8B949E';
+      dl.forEach(function (l) { y += fsS * 0.7; g.fillText(l, cx0 + pad, y); y += fsS * 0.7; });
+      var bx = cx0 + pad, by = cy0 + ch - pad - 24 * u;
+      g.font = sans(600, 26 * u);
+      [['☆', 'Star', acc], ['⑂', 'Fork', '#8B949E']].forEach(function (b) {
+        var label = b[0] + '  ' + b[1], bw2 = g.measureText(label).width + 36 * u;
+        g.fillStyle = '#21262D'; rr(g, bx, by - 25 * u, bw2, 50 * u, 12 * u); g.fill(); g.strokeStyle = '#30363D'; g.stroke();
+        g.fillStyle = '#C9D1D9'; g.fillText(label, bx + 18 * u, by + 1 * u); bx += bw2 + 14 * u;
+      });
+      return { w: cw, h: ch };
+    }
+    // the prompt bar
+    var pwid = 880 * u, pp = 32 * u, pfs = 40 * u, btn = 66 * u, lab = sub ? 30 * u : 0;
+    g.font = sans(500, pfs);
+    var lines = wrapLines(g, title, pwid - pp * 2 - btn - 18 * u).slice(0, 3), shownL = lines;
+    if (chars != null) { var left = chars; shownL = lines.map(function (l) { var part = l.slice(0, Math.max(0, left)); left -= l.length + 1; return part; }); }
+    var ph = Math.max(btn + pp * 1.2, lines.length * pfs * 1.38 + pp * 1.6) + lab, px0 = -pwid / 2, py0 = -ph / 2;
+    shadowed(function () { g.fillStyle = '#2A2724'; rr(g, px0, py0, pwid, ph, 34 * u); g.fill(); });
+    g.lineWidth = 2.5 * u; g.strokeStyle = 'rgba(255,255,255,.14)'; rr(g, px0, py0, pwid, ph, 34 * u); g.stroke();
+    g.textAlign = 'left';
+    if (sub) { g.font = sans(700, 20 * u); g.fillStyle = '#9A948A'; g.fillText(sub.toUpperCase().slice(0, 40), px0 + pp, py0 + pp * 0.9); }
+    g.font = sans(500, pfs); g.fillStyle = '#F5F1EA';
+    var ty0 = py0 + lab + pp * 0.8 + pfs * 0.69, lastX = px0 + pp, lastY = ty0, typing = chars != null && chars < title.length;
+    shownL.forEach(function (l, i) { var yy = ty0 + i * pfs * 1.38; g.fillText(l, px0 + pp, yy); if (l.length || i === 0) { lastX = px0 + pp + g.measureText(l).width; lastY = yy; } });
+    if (typing || Math.floor(lt * 2) % 2 === 0) { g.fillStyle = acc; g.fillRect(lastX + 4 * u, lastY - pfs * 0.55, 4 * u, pfs * 1.1); }
+    var bcx = px0 + pwid - pp - btn / 2 + 8 * u, bcy = py0 + ph - pp * 0.6 - btn / 2;
+    g.fillStyle = acc; g.beginPath(); g.arc(bcx, bcy, btn / 2, 0, 7); g.fill();
+    g.strokeStyle = '#FFFFFF'; g.lineWidth = 6 * u; g.lineCap = 'round';
+    g.beginPath(); g.moveTo(bcx, bcy + 15 * u); g.lineTo(bcx, bcy - 15 * u); g.moveTo(bcx - 12 * u, bcy - 3 * u); g.lineTo(bcx, bcy - 15 * u); g.lineTo(bcx + 12 * u, bcy - 3 * u); g.stroke();
+    return { w: pwid, h: ph };
   }
 
   /* A layer drawn on its own, fitted into a small canvas (the editor's style and sticker pickers). */
@@ -1727,7 +2099,7 @@
     for (var i = 0; i < plan.cues.length; i++) { if (t >= plan.cues[i].s && t < plan.cues[i].e) { cue = plan.cues[i]; break; } }
     if (!cue) return;
     var style = st.capStyle, fname = style === 'comic' && st.capFont === 'Anton' ? 'Bangers' : st.capFont;
-    var fs = 76 * u * st.capSize * (RS.FONT_SCALE[fname] || 1) * (style === 'minimal' ? 0.82 : 1);
+    var fs = 76 * u * st.capSize * (RS.FONT_SCALE[fname] || 1) * (style === 'minimal' ? 0.82 : style === 'clean' ? 0.88 : 1);
     g.font = font(fname, fs);
     g.textBaseline = 'middle'; g.textAlign = 'left'; g.lineJoin = 'round'; g.miterLimit = 2;
     var activeIdx = -1;
@@ -1775,6 +2147,12 @@
         } else if (style === 'neon') {
           g.shadowColor = st.hl; g.shadowBlur = (it.active ? 40 : 18) * u; g.fillStyle = fill; g.fillText(it.txt, 0, 0);
           g.shadowBlur = 0; g.fillText(it.txt, 0, 0);
+        } else if (style === 'clean') {
+          // plain text with a soft shadow, no box: a wide soft shadow for contrast, then a tight one for crisp edges
+          g.fillStyle = fill;
+          g.shadowColor = 'rgba(0,0,0,.6)'; g.shadowBlur = 24 * u; g.shadowOffsetY = 4 * u; g.fillText(it.txt, 0, 0);
+          g.shadowColor = 'rgba(0,0,0,.45)'; g.shadowBlur = 5 * u; g.shadowOffsetY = 2 * u; g.fillText(it.txt, 0, 0);
+          g.shadowColor = 'transparent';
         } else {
           g.shadowColor = 'rgba(0,0,0,.55)'; g.shadowBlur = 14 * u; g.shadowOffsetY = 3 * u; g.fillStyle = fill; g.fillText(it.txt, 0, 0);
           g.shadowColor = 'transparent';
@@ -1886,9 +2264,22 @@
       for (var i = 0; i < plan.segs.length; i++) if (t < plan.segs[i][1] - 0.03) return i;
       return -1;
     }
+    /* the picture-in-picture video (plan.pipSrc) follows reel time: playing along, or parked on the right frame */
+    function syncPip(plan, o) {
+      var pv = plan.pipSrc; if (!pv || !(pv.duration > 0)) return;
+      var target = o % pv.duration;
+      if (playing) {
+        if (pv.paused) { var pp = pv.play(); if (pp && pp.catch) pp.catch(function () {}); }
+        if (Math.abs(pv.currentTime - target) > 0.3) pv.currentTime = target;
+      } else {
+        if (!pv.paused) pv.pause();
+        if (Math.abs(pv.currentTime - target) > 0.05 && !pv.seeking) { pv.currentTime = target; pv.onseeked = function () { if (!playing && !dead) draw(); }; }
+      }
+    }
     function draw() {
       var plan = getPlan(); if (!plan) return;
       var t = v.currentTime, o = RS.srcToOut(plan, t);
+      syncPip(plan, o);
       RS.render(g, canvas.width, canvas.height, v, plan, t, o, Object.assign({ noFade: !playing }, self.opt));
       if (onTick) onTick(o, plan.outDur, playing);
     }
@@ -1921,7 +2312,7 @@
       }
       cancelAnimationFrame(raf); raf = requestAnimationFrame(loop);
     };
-    self.pause = function () { playing = false; v.pause(); if (music) music.pause(); cancelAnimationFrame(raf); draw(); };
+    self.pause = function () { playing = false; v.pause(); if (music) music.pause(); var pl = getPlan(); if (pl && pl.pipSrc) pl.pipSrc.pause(); cancelAnimationFrame(raf); draw(); };
     self.toggle = function () { playing ? self.pause() : self.play(); };
     self.playing = function () { return playing; };
     self.seekOut = function (o) { var plan = getPlan(); if (!plan) return Promise.resolve(); return RS.seek(v, RS.outToSrc(plan, RS.clamp(o, 0, plan.outDur - 0.01))).then(draw); };
@@ -1952,7 +2343,14 @@
     var g = canvas.getContext('2d');
     var ac, rec, v, music, musicUrl, cleanup = [];
     function finish() { cleanup.forEach(function (f) { try { f(); } catch (e) {} }); }
-    return RS.fontsReady().then(function () { return RS.videoEl(m.url); }).then(function (vid) {
+    var pipV = null;
+    return RS.fontsReady().then(function () {
+      if (!plan.pipSrc || !plan.pipSrc.src) return null;
+      return RS.videoEl(plan.pipSrc.src).then(function (pv) { pipV = pv; pv.muted = true; cleanup.push(function () { pv.pause(); pv.removeAttribute('src'); pv.load(); }); }, function () { return null; });
+    }).then(function () {
+      plan = Object.assign({}, plan, { pipSrc: pipV });
+      if (plan.st.layers.some(function (L) { return L.behind; })) return RS.person.load().catch(function () {});
+    }).then(function () { return RS.videoEl(m.url); }).then(function (vid) {
       v = vid; cleanup.push(function () { v.pause(); v.removeAttribute('src'); v.load(); });
       ac = new (window.AudioContext || window.webkitAudioContext)();
       cleanup.push(function () { ac.close(); });
@@ -1987,6 +2385,7 @@
             var s = plan.segs[segI], t = v.currentTime;
             var o = outBase + (t - s[0]) / st.speed;
             RS.render(g, W, H, v, plan, t, o);
+            if (pipV && pipV.duration > 0) { var pt = o % pipV.duration; if (pipV.paused) pipV.play().catch(function () {}); if (Math.abs(pipV.currentTime - pt) > 0.25) pipV.currentTime = pt; }
             var now = ac.currentTime, toEnd = plan.outDur - o;
             var gainV = st.vol * (st.fadeIn ? RS.clamp(o / 0.3, 0, 1) : 1) * (st.fadeOut ? RS.clamp(toEnd / 0.4, 0, 1) : 1);
             vg.gain.setTargetAtTime(gainV, now, 0.03);
@@ -1996,7 +2395,7 @@
               outBase += (s[1] - s[0]) / st.speed;
               segI++;
               if (segI >= plan.segs.length) { ended = true; v.pause(); if (music) music.pause(); RS.render(g, W, H, v, plan, t, plan.outDur - 0.001); setTimeout(function () { rec.stop(); }, 120); return; }
-              v.pause(); rec.pause(); seeking = true;
+              v.pause(); rec.pause(); seeking = true; if (pipV) pipV.pause();
               RS.seek(v, plan.segs[segI][0]).then(function () {
                 RS.render(g, W, H, v, plan, v.currentTime, outBase);
                 rec.resume(); seeking = false; return v.play();
@@ -2250,7 +2649,7 @@
 /* ===== brand.html ===== */
 (function () {
   var esc = UI.esc;
-  var CAP = [['pop', '💥 Pop'], ['karaoke', '🎤 Karaoke'], ['boxed', '📦 Boxed'], ['minimal', '🫧 Minimal'], ['neon', '🌙 Neon'], ['comic', '🗯️ Comic']];
+  var CAP = [['clean', '🤍 Clean'], ['pop', '💥 Pop'], ['karaoke', '🎤 Karaoke'], ['boxed', '📦 Boxed'], ['minimal', '🫧 Minimal'], ['neon', '🌙 Neon'], ['comic', '🗯️ Comic']];
   UI.page('brand', { title: 'Brand kit', nav: 'Brand kit', icon: 'palette', order: 30 }, function (view, ctx) {
     var kit, mine = [], dirty = false;
     view.innerHTML = '<div class="ui-wrap"><div class="ui-skel" style="height:500px"></div></div>';
@@ -2271,7 +2670,8 @@
         '<div style="margin-top:12px"><span class="small muted" style="font-weight:700">Handle corner</span>' + chips('handlePos', [['tl', '↖ Top left'], ['tr', '↗ Top right'], ['bl', '↙ Bottom left'], ['br', '↘ Bottom right'], ['off', 'Hide']]) + '</div></div>' +
         '<div class="ui-card"><h3>' + UI.icon('palette') + 'Starting look</h3><div class="bk-looks">' + RS.LOOKS.map(function (l) {
           return '<button type="button" class="ce-look' + (s.look === l.key ? ' on' : '') + '" data-look="' + l.key + '"><canvas data-lcv="' + l.key + '"></canvas>' + l.emoji + ' ' + esc(l.name) + '</button>'; }).join('') + '</div>' +
-        '<p class="ui-hint">Or pick one from the <a href="#templates" data-go="templates">community templates</a>.</p></div>' +
+        '<p class="ui-hint">Or pick one from the <a href="#templates" data-go="templates">community templates</a>.</p>' +
+        '<div style="margin-top:12px"><span class="small muted" style="font-weight:700">Colour grade</span>' + chips('grade', RS.GRADES) + '</div></div>' +
         '<div class="ui-card"><h3>' + UI.icon('cc') + 'Captions</h3>' + RS.switchHtml('captions', 'Captions on new clips', s.captions) + chips('capStyle', CAP) +
         '<div class="bk-two" style="margin-top:12px"><label class="ui-field"><span>Font</span><select data-k="capFont">' + RS.FONTS.map(function (f) {
           return '<option' + (s.capFont === f ? ' selected' : '') + ' style="font-family:\'' + f + '\'">' + f + '</option>'; }).join('') + '</select></label>' +
@@ -2355,17 +2755,52 @@
   var TABS = [['look', 'Look', 'palette'], ['captions', 'Captions', 'cc'], ['text', 'Text', 'type'], ['stickers', 'Stickers', 'smile'], ['fx', 'FX', 'sparkle'],
     ['sound', 'Sound', 'music'], ['post', 'Post', 'share']];
   var SHAPE_COLOR = { arrow: '#FF3D8B', ring: '#FF3B3B', underline: '#FFE14D', sparkles: '#FFE14D', heart: '#FF3D8B', star: '#FFE14D' };
-  var CAP_STYLES = [['pop', '💥 Pop'], ['karaoke', '🎤 Karaoke'], ['boxed', '📦 Boxed'], ['minimal', '🫧 Minimal'], ['neon', '🌙 Neon'], ['comic', '🗯️ Comic']];
+  var CAP_STYLES = [['clean', '🤍 Clean'], ['pop', '💥 Pop'], ['karaoke', '🎤 Karaoke'], ['boxed', '📦 Boxed'], ['minimal', '🫧 Minimal'], ['neon', '🌙 Neon'], ['comic', '🗯️ Comic']];
   var FONTS = RS.FONTS;
   RS.musicFiles = RS.musicFiles || {};
+  RS.pipFiles = RS.pipFiles || {};  // clip id -> {file, url, el}: the picture-in-picture video, kept on this device only
   var lastTab = 'look';
 
   UI.page('clip', { title: 'Edit reel' }, function (view, ctx) {
     var pid = ctx.args[0], cid = ctx.args[1];
-    var P, C, st, M, A, plan, player, tab = lastTab, dead = false, postSeed = 0, exporting = false, selId = null, boxes = [];
+    var P, C, st, M, A, plan, player, tab = lastTab, dead = false, postSeed = 0, exporting = false, selId = null, boxes = [], wallFrames = null;
     view.innerHTML = '<div class="ui-wrap"><div class="ui-skel" style="height:56px;margin-bottom:16px"></div><div class="ui-skel" style="height:520px"></div></div>';
     function words() { return P.transcript && P.transcript.words || []; }
-    function replan() { plan = RS.plan(C, words(), A); }
+    function replan() {
+      plan = RS.plan(C, words(), A);
+      plan.pipSrc = st.layout === 'pip' ? pipVid() : null;
+      plan.wall = st.wall ? wallFrames : null;
+      // layers pinned to a word: keep their start in step with where that word now lands in the reel
+      (st.layers || []).forEach(function (L) {
+        if (L.at == null || L.all) return;
+        var sp = RS.layerSpan(L, plan); if (sp[0] < 0) return;
+        var len = Math.max(0.3, L.e - L.s); L.s = +sp[0].toFixed(2); L.e = +(sp[0] + len).toFixed(2);
+      });
+    }
+    function pipVid() { var x = RS.pipFiles[C.id]; return x ? x.el : null; }
+    function setPipFile(f) {
+      var old = RS.pipFiles[C.id];
+      if (old) { try { old.el.pause(); old.el.removeAttribute('src'); old.el.load(); } catch (e) {} URL.revokeObjectURL(old.url); delete RS.pipFiles[C.id]; }
+      if (!f) { set('pipName', '', true); return Promise.resolve(); }
+      var url = URL.createObjectURL(f);
+      return RS.videoEl(url).then(function (v) {
+        v.muted = true; v.loop = true; RS.pipFiles[C.id] = { file: f, url: url, el: v };
+        set('pipName', f.name.slice(0, 80), true);
+      }, function (e) { URL.revokeObjectURL(url); UI.toast(e.message, 'error'); });
+    }
+    function loadWall() {
+      if (!st.wall || !M) return;
+      var D = P.duration, times = P.clips.filter(function (c) { return c.id !== C.id; }).map(function (c) { return (c.start + c.end) / 2; }).slice(0, 8);
+      for (var k = 0; k < 16 && times.length < 8; k++) { var t = D * (k + 0.5) / 16; if (t < C.start || t > C.end) times.push(t); }
+      while (times.length < 8) times.push(D * times.length / 8);
+      RS.wallFrames(M, times).then(function (fr) { if (dead) return; wallFrames = fr; replan(); if (player) player.draw(); },
+        function (e) { UI.toast('Couldn\'t read pictures for the wall: ' + e.message, 'error'); });
+    }
+    function needPerson(say) {
+      if (RS.person.ready || !(st.layers || []).some(function (L) { return L.behind; })) return;
+      if (say) UI.toast('🧍 Loading the person cut-out (first time only)…');
+      RS.person.load().then(function () { if (!dead && player) player.draw(); if (say) UI.toast('Text now goes behind you ✓', 'ok'); }, function (e) { UI.toast(e.message, 'error'); });
+    }
     function setSaved(t) { var el = view.querySelector('[data-saved]'); if (el) el.textContent = t; }
     var saveSoon = RS.debounce(function () {
       setSaved('Saving…');
@@ -2384,7 +2819,16 @@
     /* ---------- text + stickers (st.layers) */
     function layerById(id) { return (st.layers || []).filter(function (L) { return L.id === id; })[0] || null; }
     function selLayer() { return selId ? layerById(selId) : null; }
-    function tabFor(L) { return L.t === 'text' ? 'text' : 'stickers'; }
+    function tabFor(L) { return L.t === 'text' || L.t === 'card' ? 'text' : 'stickers'; }
+    function layerLabel(L) {
+      return L.t === 'shape' ? (RS.SHAPES.filter(function (x) { return x[0] === L.v; })[0] || ['', L.v])[1] : L.t === 'badge' ? '🏷️ ' + L.v : L.t === 'emoji' ? L.v :
+        L.t === 'card' ? ({ label: '🏷️ ', repo: '📦 ', prompt: '⌨️ ' }[L.card] || '🪪 ') + L.v : '✏️ ' + String(L.v).replace(/\n/g, ' ');
+    }
+    function pinLayer(L, at, word) {
+      var len = Math.max(0.3, (L.e - L.s) || 2), s0 = RS.srcToOut(plan, at);
+      L.at = +(+at).toFixed(3); L.word = String(word || '').replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/gu, '').slice(0, 40); L.all = false;
+      L.s = +s0.toFixed(2); L.e = +(s0 + len).toFixed(2);
+    }
     function nowOut() { return M && plan ? RS.srcToOut(plan, M.el.currentTime) : 0; }
     function select(id) {
       selId = id; if (player) { player.opt.selected = id; player.draw(); }
@@ -2392,21 +2836,56 @@
       if (L && tabFor(L) !== tab) showTab(tabFor(L)); else drawPanel();
     }
     function layersChanged(redraw) { set('layers', st.layers, redraw); }
-    function addLayer(L) {
+    /* pin = {at, word, len}: pin the new layer to a word. Returns false when the reel is full. */
+    function placeLayer(L, pin) {
       st.layers = (st.layers || []).slice();
-      if (st.layers.length >= 24) { UI.toast('That\'s the most text and stickers one reel can hold (24).', 'error'); return; }
-      var D = plan.outDur, len = Math.min(3, D), t0 = RS.clamp(nowOut(), 0, Math.max(0, D - len));
+      if (st.layers.length >= 24) { UI.toast('That\'s the most text and stickers one reel can hold (24).', 'error'); return false; }
+      var D = plan.outDur, len = Math.min(pin && pin.len || 3, D), t0 = RS.clamp(nowOut(), 0, Math.max(0, D - len));
       L.s = +t0.toFixed(2); L.e = +(t0 + len).toFixed(2);
-      var n = st.layers.filter(function (x) { return x.t === L.t; }).length;
-      L.y = RS.clamp(L.y + (n % 4) * 0.07, 0.08, 0.92); L.x = RS.clamp(L.x + ((n % 3) - 1) * 0.08 * (n ? 1 : 0), 0.1, 0.9);
+      if (!L.behind && L.t !== 'card') {
+        var n = st.layers.filter(function (x) { return x.t === L.t; }).length;
+        L.y = RS.clamp(L.y + (n % 4) * 0.07, 0.08, 0.92); L.x = RS.clamp(L.x + ((n % 3) - 1) * 0.08 * (n ? 1 : 0), 0.1, 0.9);
+      }
+      if (pin) pinLayer(L, pin.at, pin.word);
       st.layers.push(L);
+      return true;
+    }
+    function addLayer(L, pin) {
+      if (!placeLayer(L, pin)) return;
       if (player) player.pause();
       layersChanged(false); select(L.id);
+      if (L.behind) needPerson(true);
+      if (pin && player) player.seekOut(Math.max(0, L.s - 0.4));
+    }
+    /* A ready-made layer for a word (the Captions word picker and the Storyboard). */
+    function layerFor(kind, word, at, line) {
+      var w = String(word || '').replace(/[.,!?;:"“”()]+/g, ''), em = RS.emojiFor(word) || '✨', cap = w.charAt(0).toUpperCase() + w.slice(1);
+      if (kind === 'emoji') return { L: RS.newLayer('emoji', em, { y: 0.36 }), len: 1.6 };
+      if (kind === 'title') return { L: RS.newLayer('text', w, { size: 1.4, rot: -4 }), len: 1.6 };
+      if (kind === 'behind') return { L: RS.newLayer('text', line || w, { ts: 'plain', font: 'Anton', size: line ? 1.5 : 2.2, y: 0.2, rot: 0, behind: true, anim: 'zoom' }), len: 2.4 };
+      if (kind === 'label') return { L: RS.newLayer('card', cap, { card: 'label', icon: em === '✨' ? '🧰' : em, fill: '#22C55E', upper: false }), len: 2.2 };
+      if (kind === 'repo') return { L: RS.newLayer('card', w.toLowerCase() + '/' + w.toLowerCase(), { card: 'repo', sub: 'What ' + cap + ' does, in one line', icon: '📦', fill: '#2F81F7', upper: false }), len: 2.6 };
+      if (kind === 'prompt') return { L: RS.newLayer('card', String(line || w).replace(/\s+/g, ' ').slice(0, 120), { card: 'prompt', anim: 'type', fill: '#D97757', upper: false }), len: 3.6 };
+      return { L: RS.newLayer('badge', w.toUpperCase().slice(0, 24), { shape: 'burst', fill: '#FFE14D', rot: -6 }), len: 1.6 };
+    }
+    function lineAt(at) { var c = RS.cues(words(), C.start, C.end, 12).filter(function (x) { return at >= x.s - 0.01 && at < x.e; })[0]; return c ? c.text : ''; }
+    function wordPopModal(at, word) {
+      var w = String(word).replace(/[.,!?;:"“”()]+/g, ''), em = RS.emojiFor(word) || '✨';
+      var opts = [['emoji', em + ' Emoji sticker'], ['title', '✏️ “' + w + '” as a title'], ['behind', '🧍 Title behind you'], ['label', '🏷️ Tool label'],
+        ['repo', '📦 Repo card'], ['prompt', '⌨️ Prompt bar (this line)'], ['badge', '💥 Word sticker']];
+      var m = UI.modal('<h2>On “' + esc(w) + '”</h2><p class="muted">Pops in the moment you say it, and follows the word if you trim the clip.</p><div class="ce-pop-opts">' +
+        opts.map(function (o) { return '<button type="button" class="ui-btn" data-p="' + o[0] + '">' + esc(o[1]) + '</button>'; }).join('') + '</div>' +
+        '<div class="ui-row end" style="margin-top:14px"><button type="button" class="ui-btn ghost" data-close>Cancel</button></div>');
+      m.el.addEventListener('click', function (e) {
+        var b = e.target.closest('[data-p]'); if (!b) return;
+        var k = b.getAttribute('data-p'), made = layerFor(k, w, at, k === 'prompt' ? lineAt(at) : '');
+        m.close(); addLayer(made.L, { at: at, word: w, len: made.len });
+      });
     }
     function setLayer(k, v, redraw) {
       var L = selLayer(); if (!L) return;
       if (k === 'len') L.e = +(L.s + v).toFixed(2);
-      else if (k === 's') { var len = L.e - L.s; L.s = v; L.e = +(v + len).toFixed(2); }
+      else if (k === 's') { var len = L.e - L.s; L.s = v; L.e = +(v + len).toFixed(2); delete L.at; delete L.word; }
       else L[k] = v;
       layersChanged(redraw);
     }
@@ -2426,29 +2905,38 @@
     var LSHOW = { size: function (v) { return Math.round(v * 100) + '%'; }, rot: function (v) { return Math.round(v) + '°'; },
       s: function (v) { return (+v).toFixed(1) + 's'; }, len: function (v) { return (+v).toFixed(1) + 's'; } };
     function layerList(type) {
-      var list = (st.layers || []).filter(function (L) { return type === 'text' ? L.t === 'text' : L.t !== 'text'; });
+      var list = (st.layers || []).filter(function (L) { var tx = L.t === 'text' || L.t === 'card'; return type === 'text' ? tx : !tx; });
       if (!list.length) return '';
       return '<div class="ce-sec"><h4>On this reel (' + list.length + ')</h4><div class="ce-layers">' + list.map(function (L) {
-        var label = L.t === 'shape' ? (RS.SHAPES.filter(function (x) { return x[0] === L.v; })[0] || ['', L.v])[1] : L.t === 'badge' ? '🏷️ ' + L.v : L.t === 'emoji' ? L.v : '✏️ ' + L.v.replace(/\n/g, ' ');
-        return '<button type="button" class="ce-lrow' + (L.id === selId ? ' on' : '') + '" data-sel="' + esc(L.id) + '"><span>' + esc(label) + '</span><small>' +
-          (L.all ? 'whole reel' : (+L.s).toFixed(1) + '–' + (+L.e).toFixed(1) + 's') + '</small></button>'; }).join('') + '</div></div>';
+        return '<button type="button" class="ce-lrow' + (L.id === selId ? ' on' : '') + '" data-sel="' + esc(L.id) + '"><span>' + esc(layerLabel(L)) + '</span><small>' +
+          (L.behind ? '🧍 ' : '') + (L.all ? 'whole reel' : L.at != null && L.word ? '📌 “' + esc(L.word) + '”' : (+L.s).toFixed(1) + '–' + (+L.e).toFixed(1) + 's') + '</small></button>'; }).join('') + '</div></div>';
     }
     function layerEditor(L) {
       var D = Math.max(1, plan.outDur), isText = L.t === 'text', h = '';
-      var head = isText ? '✏️ Edit text' : L.t === 'emoji' ? L.v + ' Edit sticker' : L.t === 'badge' ? '🏷️ Edit word sticker' : '🖍️ Edit doodle';
+      var head = isText ? '✏️ Edit text' : L.t === 'emoji' ? L.v + ' Edit sticker' : L.t === 'badge' ? '🏷️ Edit word sticker' : L.t === 'card' ? '🪪 Edit card' : '🖍️ Edit doodle';
       h += '<div class="ui-card ce-led ce-sec" data-led><div class="ce-led-head"><b>' + esc(head) + '</b>' +
         '<button type="button" class="ui-btn sm icon" data-ldup title="Duplicate" aria-label="Duplicate">' + UI.icon('copy') + '</button>' +
         '<button type="button" class="ui-btn sm danger icon" data-ldel title="Delete" aria-label="Delete">' + UI.icon('trash') + '</button>' +
         '<button type="button" class="ui-btn sm" data-ldone>' + UI.icon('check') + 'Done</button></div>';
       if (isText) {
-        var tsName = { outline: 'Outline', double: 'Outer outline', pop3d: '3D side', hollow: 'Outline', glow: 'Glow', sticker: 'Box', marker: 'Highlighter', plain: 'Shadow' }[L.ts] || 'Outline';
+        var tsName = { outline: 'Outline', double: 'Outer outline', pop3d: '3D side', hollow: 'Outline', glow: 'Glow', sticker: 'Box', marker: 'Highlighter', plain: 'Shadow', magazine: '' }[L.ts] || 'Outline';
         h += '<label class="ui-field"><span>Text</span><textarea data-lk="v" maxlength="120" rows="2">' + esc(L.v) + '</textarea></label>' +
           '<div><span class="ce-sub">Font</span><div class="ce-fonts">' + FONTS.map(function (f) {
             return '<button type="button" class="ce-font' + (L.font === f ? ' on' : '') + '" data-lchip="font" data-v="' + esc(f) + '" style="font-family:\'' + f + '\'">' + esc(f) + '</button>'; }).join('') + '</div></div>' +
           '<div><span class="ce-sub">Outline style</span>' + lchips('ts', RS.TEXT_STYLES.map(function (x) { return [x.key, x.name]; }), L.ts) + '</div>' +
           '<div class="ce-colors">' + (L.ts === 'hollow' ? '' : '<label>Fill<input type="color" data-lk="fill" value="' + esc(L.fill) + '"></label>') +
-          (L.ts === 'plain' ? '' : '<label>' + tsName + '<input type="color" data-lk="line" value="' + esc(L.line) + '"></label>') + '</div>' +
+          (L.ts === 'plain' || L.ts === 'magazine' ? '' : '<label>' + tsName + '<input type="color" data-lk="line" value="' + esc(L.line) + '"></label>') + '</div>' +
+          (L.ts === 'magazine' ? '<label class="ui-field"><span>Issue line (above the title)</span><input type="text" data-lk="sub" maxlength="60" value="' + esc(L.sub || '') + '" placeholder="No. 01 · November 2026 · The reel issue"></label>' : '') +
           '<label class="rs-switch"><span>ALL CAPS</span><input type="checkbox" data-lk="upper"' + (L.upper ? ' checked' : '') + '></label>';
+      } else if (L.t === 'card') {
+        var ck = L.card || 'label';
+        h += '<div><span class="ce-sub">Kind</span>' + lchips('card', RS.CARDS.map(function (x) { return [x.key, x.name]; }), ck) + '</div>' +
+          '<label class="ui-field"><span>' + (ck === 'prompt' ? 'Prompt text' : ck === 'repo' ? 'Repo name' : 'Name') + '</span>' +
+          (ck === 'prompt' ? '<textarea data-lk="v" maxlength="120" rows="2">' + esc(L.v) + '</textarea>' : '<input type="text" data-lk="v" maxlength="60" value="' + esc(L.v) + '">') + '</label>' +
+          (ck !== 'label' ? '<label class="ui-field"><span>' + (ck === 'repo' ? 'Description' : 'Small label above (optional)') + '</span><input type="text" data-lk="sub" maxlength="120" value="' + esc(L.sub || '') + '" placeholder="' + (ck === 'repo' ? 'What it does' : 'To Claude') + '"></label>' : '') +
+          '<div class="ce-two">' + (ck !== 'prompt' ? '<label class="ui-field"><span>Icon (an emoji)</span><input type="text" data-lk="icon" maxlength="8" value="' + esc(L.icon || '') + '"></label>' : '') +
+          '<div class="ce-colors"><label>Accent<input type="color" data-lk="fill" value="' + esc(L.fill) + '"></label></div></div>' +
+          (ck === 'prompt' ? '<p class="ui-hint" style="margin:0">Pick the <b>⌨️ Type</b> entrance below and it types itself out.</p>' : '');
       } else if (L.t === 'badge') {
         h += '<label class="ui-field"><span>Words</span><input type="text" data-lk="v" maxlength="24" value="' + esc(L.v) + '"></label>' +
           '<div><span class="ce-sub">Shape</span>' + lchips('shape', [['burst', '💥 Burst'], ['pill', '💊 Pill'], ['bubble', '💬 Bubble'], ['circle', '⭕ Circle']], L.shape) + '</div>' +
@@ -2460,12 +2948,24 @@
       h += '<div class="ce-two">' + lrange('size', 'Size', L.size, 0.3, 3, 0.05, LSHOW.size) + lrange('rot', 'Turn', L.rot, -180, 180, 1, LSHOW.rot) + '</div>' +
         '<div><span class="ce-sub">Comes in with</span>' + lchips('anim', RS.ANIMS.filter(function (a) { return isText || a[0] !== 'type'; }), L.anim) + '</div>' +
         '<div><span class="ce-sub">While on screen</span>' + lchips('loop', RS.LOOPS, L.loop) + '</div>' +
+        '<label class="rs-switch"><span>🧍 Behind the person<small>Cuts the person out of the picture so this sits behind them. Works best with one person in the shot.' +
+          (L.behind && RS.person.failed ? ' The cut-out didn\'t load: check your connection.' : '') + '</small></span><input type="checkbox" data-lk="behind"' + (L.behind ? ' checked' : '') + '></label>' +
         '<div><label class="rs-switch"><span>Show for the whole reel</span><input type="checkbox" data-lk="all"' + (L.all ? ' checked' : '') + '></label>' +
         (L.all ? '' : '<div class="ce-two">' + lrange('s', 'Starts at', Math.min(L.s, D), 0, +(D - 0.3).toFixed(1), 0.1, LSHOW.s) +
           lrange('len', 'Stays for', RS.clamp(L.e - L.s, 0.3, D), 0.3, +D.toFixed(1), 0.1, LSHOW.len) + '</div>' +
           '<div class="ui-row" style="margin-top:8px"><button type="button" class="ui-btn sm" data-lhere>' + UI.icon('timer') + 'Start at the playhead</button></div>') + '</div>' +
+        pinHtml(L) +
         '<p class="ui-hint" style="margin:0">Drag it on the preview to move it. Drag the ↻ handle to resize and turn.</p></div>';
       return h;
+    }
+    function pinHtml(L) {
+      var ws = RS.wordsIn(words(), C.start, C.end);
+      if (!ws.length || L.all) return '';
+      return '<div><span class="ce-sub">Pin to a word</span><div class="ce-words">' + ws.slice(0, 200).map(function (w) {
+        var on = L.at != null && Math.abs(w[0] - L.at) < 0.005;
+        return '<button type="button" class="ce-word' + (on ? ' on' : '') + '" data-lword="' + w[0] + '" data-wtext="' + esc(w[2]) + '">' + esc(w[2]) + '</button>'; }).join('') + '</div>' +
+        '<p class="ui-hint" style="margin:6px 0 0">' + (L.at != null ? '📌 Pops in on “' + esc(L.word || '') + '” and follows that word if you trim the clip. <button type="button" class="ui-btn sm ghost" data-lunpin>Unpin</button>'
+          : 'Tap a word and it pops in exactly when it\'s said.') + '</p></div>';
     }
 
     /* ---------- layout */
@@ -2478,6 +2978,7 @@
         '<span class="ce-nav">' + (prev ? '<a class="ui-btn sm icon" title="Previous clip" href="#clip/' + esc(pid) + '/' + esc(prev.id) + '" data-go="clip/' + esc(pid) + '/' + esc(prev.id) + '">' + UI.icon('back') + '</a> ' : '') +
         '<span class="ui-badge">' + (idx + 1) + ' / ' + P.clips.length + '</span>' +
         (next ? ' <a class="ui-btn sm icon" title="Next clip" href="#clip/' + esc(pid) + '/' + esc(next.id) + '" data-go="clip/' + esc(pid) + '/' + esc(next.id) + '">' + UI.icon('arrow') + '</a>' : '') + '</span>' +
+        '<button class="ui-btn" data-board title="Storyboard: every line and what\'s on screen">' + UI.icon('list') + '<span class="ce-hide-sm">Storyboard</span></button>' +
         '<button class="ui-btn primary" data-export' + (M ? '' : ' disabled') + '>' + UI.icon('download') + 'Export</button></div>' +
         '<div class="ce-grid"><div class="ce-left">' +
         (M ? '<div class="ce-phone"><canvas data-cv></canvas><span class="ce-hint" data-hint>Drag to reframe · tap text to edit</span></div>' +
@@ -2513,7 +3014,7 @@
           '<div class="ui-row" style="margin-top:12px"><button class="ui-btn sm" data-templates>' + UI.icon('grid') + 'Community templates</button>' +
           (UI.me ? '<button class="ui-btn sm" data-share-tpl>' + UI.icon('share') + 'Share this look</button>' : '') + '</div></div>' +
           '<div class="ce-sec"><h4>Shape</h4>' + chips('aspect', [['9:16', '9:16 Reels · TikTok · Shorts'], ['4:5', '4:5 Feed'], ['1:1', '1:1 Square'], ['16:9', '16:9 Wide']]) + '</div>' +
-          '<div class="ce-sec"><h4>Layout</h4><div class="ce-layouts">' + [['fill', 'Fill'], ['fit', 'Fit + blur'], ['framed', 'Framed'], ['split', 'Split']].map(function (l) {
+          '<div class="ce-sec"><h4>Layout</h4><div class="ce-layouts">' + [['fill', 'Fill'], ['fit', 'Fit + blur'], ['framed', 'Framed'], ['split', 'Split'], ['pip', 'Corner card']].map(function (l) {
             return '<button type="button" class="ce-layout' + (st.layout === l[0] ? ' on' : '') + '" data-layout data-v="' + l[0] + '"><i></i>' + l[1] + '</button>'; }).join('') + '</div></div>' +
           '<div class="ce-sec"><h4>' + (st.layout === 'split' ? 'Top half' : 'Framing') + '</h4><div class="ce-two">' +
           RS.rangeHtml('zoom', 'Zoom', st.zoom, 1, 3, 0.01, times) + RS.rangeHtml('fx', 'Left ↔ right', st.fx, 0, 1, 0.01, pct) + RS.rangeHtml('fy', 'Up ↕ down', st.fy, 0, 1, 0.01, pct) +
@@ -2522,6 +3023,17 @@
           (st.layout === 'split' ? '<div class="ce-sec"><h4>Bottom half</h4><div class="ce-two">' + RS.rangeHtml('zoom2', 'Zoom', st.zoom2, 1, 3, 0.01, times) +
             RS.rangeHtml('fx2', 'Left ↔ right', st.fx2, 0, 1, 0.01, pct) + RS.rangeHtml('fy2', 'Up ↕ down', st.fy2, 0, 1, 0.01, pct) + '</div></div>' : '') +
           (st.layout === 'framed' ? '<div class="ce-sec"><h4>Background</h4><div class="ce-colors">' + color('bg', 'Colour') + '</div></div>' : '') +
+          (st.layout === 'pip' ? '<div class="ce-sec"><h4>Corner card</h4>' + chips('pipPos', [['tl', '↖ Top left'], ['tr', '↗ Top right'], ['bl', '↙ Bottom left'], ['br', '↘ Bottom right']]) +
+            '<div class="ce-two" style="margin-top:10px">' + RS.rangeHtml('pipSize', 'Card size', st.pipSize, 0.25, 0.6, 0.01, pct) + RS.rangeHtml('zoom2', 'Zoom', st.zoom2, 1, 3, 0.01, times) +
+            RS.rangeHtml('fx2', 'Left ↔ right', st.fx2, 0, 1, 0.01, pct) + RS.rangeHtml('fy2', 'Up ↕ down', st.fy2, 0, 1, 0.01, pct) + '</div>' +
+            '<div class="ui-row" style="margin-top:10px"><label class="ui-btn sm">' + UI.icon('film') + (pipVid() ? 'Change the card video' : 'Use another video') + '<input type="file" accept="video/*" data-pipfile hidden></label>' +
+            (pipVid() ? '<span class="ui-badge lime">🎞️ ' + esc(st.pipName.slice(0, 36)) + '</span><button type="button" class="ui-btn sm ghost" data-pip-x>' + UI.icon('x') + 'Back to this video</button>'
+              : st.pipName ? '<span class="small muted">Last time: ' + esc(st.pipName) + ' (choose it again)</span>' : '') + '</div>' +
+            '<p class="ui-hint">The card shows a second crop of this video (great for a face cam), or another video from this device, like the clip you\'re reacting to. It plays muted and stays on this device.</p></div>' : '') +
+          '<div class="ce-sec"><h4>Colour</h4><div class="ce-grades">' + RS.GRADES.map(function (gr) {
+            return '<button type="button" class="ce-grade' + (st.grade === gr[0] ? ' on' : '') + '" data-grade="' + gr[0] + '"><canvas data-grade-cv="' + gr[0] + '"></canvas>' + esc(gr[1]) + '</button>'; }).join('') + '</div>' +
+            (st.grade !== 'none' ? '<div style="margin-top:12px">' + RS.rangeHtml('gradeAmt', 'Strength', st.gradeAmt, 0.1, 1, 0.05, pct) +
+              RS.switchHtml('gradeWipe', 'Before / after slider', st.gradeWipe, 'A slider sweeps across in the first 2 seconds to show off the change.') + '</div>' : '') + '</div>' +
           '<div class="ce-sec">' + RS.switchHtml('punch', 'Punch-in zoom', st.punch, 'Zooms in a touch on the loudest moments.') + '</div>';
       },
       captions: function () {
@@ -2532,13 +3044,16 @@
             '<label class="ui-btn sm">' + UI.icon('upload') + 'Import .srt / .vtt<input type="file" accept=".srt,.vtt" data-subs hidden></label>' +
             '<button class="ui-btn sm" data-cue-add>' + UI.icon('type') + 'Type them</button></div>' +
             '<div data-tx-run hidden class="pj-run" style="margin-top:10px"><b data-tx-msg>Starting…</b><div class="rs-progress"><i data-tx-bar></i></div></div></div>' : '') +
-          '<div class="ce-sec"><h4>Style</h4>' + chips('capStyle', CAP_STYLES) + '</div>' +
+          '<div class="ce-sec"><h4>Style</h4>' + chips('capStyle', CAP_STYLES) + (st.capStyle === 'clean' ? '<p class="ui-hint">Plain text with a soft shadow, no box: the cleanest look.</p>' : '') + '</div>' +
           '<div class="ce-sec"><div class="ce-two"><label class="ui-field"><span>Font</span><select data-k="capFont">' + FONTS.map(function (f) {
             return '<option' + (st.capFont === f ? ' selected' : '') + ' style="font-family:\'' + f + '\'">' + f + '</option>'; }).join('') + '</select></label>' +
           '<div class="ce-sec"><h4 style="margin-bottom:8px">Words at a time</h4>' + chips('capWords', [1, 2, 3, 4, 5]) + '</div>' +
           RS.rangeHtml('capSize', 'Size', st.capSize, 0.5, 2, 0.05, pct) + RS.rangeHtml('capPos', 'Height on screen', st.capPos, 0.1, 0.95, 0.01, pct) + '</div></div>' +
           '<div class="ce-sec"><div class="ce-colors">' + color('hl', 'Highlight') + color('capColor', 'Text') + '</div>' +
           RS.switchHtml('capUpper', 'ALL CAPS', st.capUpper) + RS.switchHtml('capEmoji', 'Auto emoji', st.capEmoji, 'Pops a matching emoji above some words 🔥') + '</div>' +
+          (cues.length ? '<div class="ce-sec"><h4>Pop something on a word</h4><div class="ce-words">' + RS.wordsIn(words(), C.start, C.end).slice(0, 200).map(function (w) {
+            return '<button type="button" class="ce-word" data-wordpop="' + w[0] + '" data-wtext="' + esc(w[2]) + '">' + esc(w[2]) + '</button>'; }).join('') + '</div>' +
+            '<p class="ui-hint">Tap a word to drop an emoji, a title, a tool label or a prompt bar exactly when it\'s said. Or plan the whole clip in the <button type="button" class="ui-btn sm ghost" data-board>' + UI.icon('list') + 'Storyboard</button></p></div>' : '') +
           (cues.length ? '<div class="ce-sec"><h4>Edit the words</h4><div class="ce-cues" data-cues>' + cues.map(function (c, i) {
             return '<div class="ce-cue" data-cue="' + i + '" data-s="' + c.s + '" data-e="' + c.e + '"><button type="button" class="t" data-cue-seek>' + RS.fmt(c.s - C.start, true) + '</button>' +
               '<input type="text" value="' + esc(c.text) + '" data-cue-text maxlength="200"><button type="button" class="ui-btn sm ghost icon" data-cue-del aria-label="Delete line">' + UI.icon('x') + '</button></div>'; }).join('') + '</div>' +
@@ -2546,10 +3061,14 @@
       },
       text: function () {
         var L = selLayer();
-        return (L && L.t === 'text' ? layerEditor(L) : '') +
+        return (L && (L.t === 'text' || L.t === 'card') ? layerEditor(L) : '') +
           '<div class="ce-sec"><h4>Add text</h4><div class="ce-tstyles">' + RS.TEXT_STYLES.map(function (x) {
             return '<button type="button" class="ce-ts" data-add-text="' + x.key + '"><canvas data-ts-cv="' + x.key + '"></canvas><span>' + esc(x.name) + '</span></button>'; }).join('') + '</div>' +
-          '<p class="ui-hint">Pick a style to drop a text box at the playhead. 11 fonts, 8 outline styles.</p></div>' +
+          '<p class="ui-hint">Pick a style to drop a text box at the playhead. 12 fonts, 9 styles.</p></div>' +
+          '<div class="ce-sec"><h4>Cards & big titles</h4><div class="ce-cards">' + RS.CARDS.map(function (c) {
+            return '<button type="button" class="ui-btn sm" data-add-card="' + c.key + '">' + { label: '🏷️', repo: '📦', prompt: '⌨️' }[c.key] + ' ' + esc(c.name) + '</button>'; }).join('') +
+          '<button type="button" class="ui-btn sm" data-add-mag>📰 Magazine cover</button><button type="button" class="ui-btn sm" data-add-behind>🧍 Big title behind you</button></div>' +
+          '<p class="ui-hint">Tool labels, a GitHub-style repo card and a prompt bar that types itself. Pin any of them to a word so they land the moment you say it.</p></div>' +
           layerList('text') +
           '<div class="ce-sec"><h4>Hook</h4>' + field('hook', 'Big text for the first seconds', 'Wait for it… 👀', 90) +
           '<div class="ce-two" style="margin-top:10px">' + RS.rangeHtml('hookSecs', 'Shows for', st.hookSecs, 1, 8, 0.5, function (v) { return v + 's'; }) +
@@ -2563,7 +3082,7 @@
       },
       stickers: function () {
         var L = selLayer();
-        return (L && L.t !== 'text' ? layerEditor(L) : '') +
+        return (L && L.t !== 'text' && L.t !== 'card' ? layerEditor(L) : '') +
           '<div class="ce-sec"><h4>Emoji stickers</h4>' + Object.keys(RS.EMOJI).map(function (cat) {
             return '<div class="ce-emo-cat"><span>' + esc(cat) + '</span><div class="ce-emojis">' + RS.EMOJI[cat].map(function (em) {
               return '<button type="button" class="ce-emo" data-add-emoji="' + em + '" aria-label="Add ' + em + '">' + em + '</button>'; }).join('') + '</div></div>'; }).join('') + '</div>' +
@@ -2576,7 +3095,8 @@
       },
       fx: function () {
         var n = plan.joins.length, scenes = A && A.cuts ? A.cuts.filter(function (c) { return c > C.start && c < C.end; }).length : 0;
-        return '<div class="ce-sec"><h4>Intro</h4>' + chips('transIn', RS.TRANS) + '</div>' +
+        return '<div class="ce-sec"><h4>Intro</h4>' + RS.switchHtml('wall', '🧱 Start with a 3×3 wall', st.wall, 'Your shot shrinks into the middle of a wall of 8 other moments from this video, then zooms back in. Replaces the intro transition.') +
+          (st.wall ? '' : chips('transIn', RS.TRANS)) + '</div>' +
           '<div class="ce-sec"><h4>Between cuts</h4>' + chips('transCut', RS.TRANS) +
           '<p class="ui-hint">' + (n ? '✂️ Plays at ' + UI.plural(n, 'cut') + ' in this reel.' : 'No cuts in this reel yet. Turn on <b>Cut the silences</b> in Sound, or the switch below.') + '</p>' +
           RS.switchHtml('transScenes', 'Also on scene changes', st.transScenes, A && A.cuts ? 'When the video itself jumps to a new shot (' + UI.plural(scenes, 'change') + ' in this clip).' : 'Needs the video to be read first (open the project).') + '</div>' +
@@ -2623,6 +3143,9 @@
         var l = RS.lookByKey(cv.getAttribute('data-look-cv'));
         RS.stylePreview(cv, RS.applyLook(Object.assign({}, st, { aspect: '9:16', hook: '' }), l.style, l.key), { width: 120, hook: '' });
       });
+      if (tab === 'look') panel.querySelectorAll('[data-grade-cv]').forEach(function (cv) {
+        RS.gradeThumb(cv, M && M.el.readyState >= 2 ? M.el : RS.demoSource(), cv.getAttribute('data-grade-cv'), st.grade === cv.getAttribute('data-grade-cv') ? st.gradeAmt : 0.8, st);
+      });
       if (tab === 'captions') markCue();
       if (tab === 'text') panel.querySelectorAll('[data-ts-cv]').forEach(function (cv) {
         var x = RS.TEXT_STYLES.filter(function (y) { return y.key === cv.getAttribute('data-ts-cv'); })[0];
@@ -2664,6 +3187,7 @@
       var start = null, pts = {};
       function region(e) {
         var r = cv.getBoundingClientRect(), y = (e.clientY - r.top) / r.height;
+        if (st.layout === 'pip') { var pr = RS.pipRect(st, cv.width, cv.height), p = canvasPt(e); return p.x >= pr.x && p.x <= pr.x + pr.w && p.y >= pr.y && p.y <= pr.y + pr.h ? '2' : ''; }
         return st.layout === 'split' && y > st.split ? '2' : '';
       }
       function canvasPt(e) { var r = cv.getBoundingClientRect(); return { x: (e.clientX - r.left) * cv.width / r.width, y: (e.clientY - r.top) * cv.height / r.height }; }
@@ -2733,6 +3257,7 @@
         var sw = M.width || 16, sh = M.height || 9, W = 1, H = r.height / r.width;
         if (st.layout === 'split') H = start.reg ? H * (1 - st.split) : H * st.split;
         if (st.layout === 'fit' || st.layout === 'framed') { W = st.layout === 'framed' ? 0.88 : 1; H = W * sh / sw; }
+        if (st.layout === 'pip' && start.reg) { var pr2 = RS.pipRect(st, cv.width, cv.height), pv = pipVid(); W = pr2.w / cv.width; H = pr2.h / cv.width; if (pv && pv.videoWidth) { sw = pv.videoWidth; sh = pv.videoHeight; } }
         var z = st['zoom' + start.reg], sc = Math.max(W / sw, H / sh) * z, ox = sw * sc - W, oy = sh * sc - H;
         var nfx = ox > 0.001 ? RS.clamp(start.fx - dx / ox, 0, 1) : st['fx' + start.reg], nfy = oy > 0.001 ? RS.clamp(start.fy - dy * (r.height / r.width) / oy, 0, 1) : st['fy' + start.reg];
         st['fx' + start.reg] = +nfx.toFixed(3); set('fy' + start.reg, +nfy.toFixed(3));
@@ -2858,6 +3383,86 @@
       }).catch(function (e) { run.hidden = true; btn.disabled = false; UI.toast(e.message, 'error'); });
     }
 
+    /* ---------- storyboard: every line, what's on screen while it's said, ideas to add (RS.suggestBoard) */
+    function boardModal() {
+      if (player) player.pause();
+      var rows = RS.cues(words(), C.start, C.end, 12), ideas = [];
+      var tName = function (k) { return (RS.TRANS.filter(function (x) { return x[0] === k; })[0] || ['', k])[1]; };
+      var gName = function (k) { return (RS.GRADES.filter(function (x) { return x[0] === k; })[0] || ['', k])[1]; };
+      function onScreen(r, i) {
+        var a = RS.srcToOut(plan, r.s), b = i < rows.length - 1 ? RS.srcToOut(plan, rows[i + 1].s) : plan.outDur, out = [];
+        if (!i) {
+          if (st.hook) out.push({ txt: '🪝 Hook: ' + st.hook, fx: true });
+          out.push({ txt: st.wall ? '🧱 3×3 wall intro' : st.transIn !== 'none' ? tName(st.transIn) + ' intro' : '', fx: true });
+          if (st.grade !== 'none') out.push({ txt: gName(st.grade) + ' colour' + (st.gradeWipe ? ' + before/after slider' : ''), fx: true });
+          if (st.layout === 'pip') out.push({ txt: '🖼️ Corner card' + (st.pipName ? ': ' + st.pipName : ''), fx: true });
+        }
+        (st.layers || []).forEach(function (L) {
+          var sp = RS.layerSpan(L, plan);
+          if (L.all ? !i : sp[0] < b && sp[0] >= a - 0.001 || (!i && sp[0] < a)) out.push({ txt: layerLabel(L) + (L.behind ? ' · behind you' : '') + (L.all ? ' · whole reel' : ''), id: L.id });
+        });
+        if (st.transCut !== 'none') plan.joins.forEach(function (j) { if (j >= a && j < b) out.push({ txt: '✂️ ' + tName(st.transCut) + ' cut', fx: true }); });
+        return out.filter(function (x) { return x.txt; });
+      }
+      var m = UI.modal('<h2>📋 Storyboard</h2><p class="muted">Every line you say and what\'s on screen while you say it. Agree on the plan here first, then fine-tune on the preview.</p>' +
+        '<div class="sb-bar"><button type="button" class="ui-btn sm primary" data-sb-suggest>' + UI.icon('wand') + 'Suggest a plan</button>' +
+        '<button type="button" class="ui-btn sm lime" data-sb-apply hidden></button>' +
+        '<button type="button" class="ui-btn sm" data-sb-copy>' + UI.icon('copy') + 'Copy as text</button></div>' +
+        '<div class="sb-wrap" data-sb-body></div><div class="ui-row end"><button type="button" class="ui-btn ghost" data-close>Done</button></div>', { wide: true });
+      var el = m.el;
+      function draw() {
+        var body = el.querySelector('[data-sb-body]');
+        if (!rows.length) { body.innerHTML = '<div class="ui-empty"><h3>No words yet</h3><p>Write the captions first (the Captions tab), then the storyboard fills itself in.</p></div>'; el.querySelector('[data-sb-suggest]').disabled = true; return; }
+        body.innerHTML = '<table class="sb-table"><thead><tr><th>#</th><th>Time</th><th>You say</th><th>On screen</th></tr></thead><tbody>' + rows.map(function (r, i) {
+          var chipsH = onScreen(r, i).map(function (x) {
+            return '<span class="sb-chip' + (x.fx ? ' fx' : '') + '">' + esc(x.txt) + (x.id ? '<button type="button" class="sb-x" data-sb-del="' + esc(x.id) + '" aria-label="Remove" title="Remove">×</button>' : '') + '</span>'; }).join('');
+          var ideaH = ideas.map(function (d, k) { return d.row === i ? '<button type="button" class="sb-chip idea' + (d.on ? '' : ' off') + '" data-idea="' + k + '" title="Tap to skip or keep">💡 ' + esc(d.label) + '</button>' : ''; }).join('');
+          return '<tr><td class="n">' + (i + 1) + '</td><td class="t"><button type="button" data-sb-seek="' + r.s + '">' + RS.fmt(RS.srcToOut(plan, r.s), true) + '</button></td>' +
+            '<td class="sb-says">' + esc(r.text) + '</td><td><div class="sb-on">' + chipsH + ideaH +
+            '<select class="sb-add" data-sb-add="' + i + '" aria-label="Add to this line"><option value="">+ Add…</option><option value="title">✏️ Title</option><option value="behind">🧍 Line behind you</option>' +
+            '<option value="emoji">😀 Emoji</option><option value="label">🏷️ Tool label</option><option value="prompt">⌨️ Prompt bar</option><option value="badge">💥 Word sticker</option></select></div></td></tr>'; }).join('') + '</tbody></table>';
+        var on = ideas.filter(function (d) { return d.on; }).length, ap = el.querySelector('[data-sb-apply]');
+        ap.hidden = !ideas.length; ap.textContent = on ? 'Add ' + UI.plural(on, 'idea') + ' to the reel' : 'Nothing picked';
+        ap.disabled = !on;
+      }
+      function keyWord(r) { return r.words.map(function (w) { return String(w[2]).replace(/[^\p{L}\p{N}'’-]/gu, ''); }).sort(function (x, y) { return y.length - x.length; })[0] || 'this'; }
+      function changed() { layersChanged(false); if (tab === 'text' || tab === 'stickers') drawPanel(); draw(); }
+      el.addEventListener('click', function (e) {
+        var b;
+        if (e.target.closest('[data-sb-suggest]')) {
+          ideas = RS.suggestBoard(rows, st, plan).map(function (d) { d.on = true; return d; });
+          if (!ideas.length) UI.toast('No new ideas for this clip: it already looks planned!'); draw(); return;
+        }
+        if ((b = e.target.closest('[data-idea]'))) { var d = ideas[+b.getAttribute('data-idea')]; d.on = !d.on; draw(); return; }
+        if (e.target.closest('[data-sb-apply]')) {
+          var n = 0, anyBehind = false;
+          ideas.filter(function (x) { return x.on; }).forEach(function (x) {
+            if (x.kind === 'hook') { st.hook = x.hook; n++; return; }
+            var made = layerFor(x.kind, x.word, x.at, x.line);
+            if (placeLayer(made.L, { at: x.at, word: x.word, len: x.len || made.len })) { n++; if (made.L.behind) anyBehind = true; }
+          });
+          ideas = []; C.style = st; changed();
+          if (anyBehind) needPerson(true);
+          UI.toast('Added ' + UI.plural(n, 'thing') + ' to the reel ✓', 'ok'); return;
+        }
+        if ((b = e.target.closest('[data-sb-del]'))) { var id = b.getAttribute('data-sb-del'); st.layers = st.layers.filter(function (L) { return L.id !== id; }); if (selId === id) select(null); changed(); return; }
+        if ((b = e.target.closest('[data-sb-seek]'))) { if (player) player.seekSrc(+b.getAttribute('data-sb-seek')); return; }
+        if (e.target.closest('[data-sb-copy]')) {
+          copy('Storyboard: ' + C.title + '\n\n' + rows.map(function (r, i) {
+            return (i + 1) + '. ' + RS.fmt(RS.srcToOut(plan, r.s), true) + ' | ' + r.text + ' | ' + (onScreen(r, i).map(function (x) { return x.txt; }).join('; ') || '-'); }).join('\n'));
+        }
+      });
+      el.addEventListener('change', function (e) {
+        var sel = e.target.closest('[data-sb-add]'); if (!sel || !sel.value) return;
+        var r = rows[+sel.getAttribute('data-sb-add')], k = sel.value, w = keyWord(r);
+        var at = (r.words.filter(function (x) { return String(x[2]).indexOf(w) >= 0; })[0] || r.words[0])[0];
+        if (k === 'prompt' || k === 'behind') at = r.s;
+        var made = layerFor(k, w, at, k === 'prompt' || k === 'behind' ? r.text.replace(/[.,!?]+$/, '') : '');
+        if (placeLayer(made.L, { at: at, word: k === 'prompt' || k === 'behind' ? r.words[0][2] : w, len: made.len })) { changed(); if (made.L.behind) needPerson(true); }
+      });
+      draw();
+    }
+
     /* ---------- templates */
     function templatesModal() {
       var m = UI.modal('<h2>Templates</h2><p class="muted">Looks shared by other creators. Applying one keeps your framing, hook and timing.</p><div class="ce-tpl-grid" data-tg><div class="ui-skel"></div></div>', { wide: true });
@@ -2901,6 +3506,7 @@
         '<canvas class="ce-exp-canvas" data-exp-cv></canvas><div class="rs-progress"><i data-exp-bar></i></div>' +
         '<div class="ui-row end" style="margin-top:14px"><button class="ui-btn ghost" data-close>Cancel</button></div>', { onclose: function () { if (!done) signal.aborted = true; exporting = false; } });
       var el = m.el, cv = el.querySelector('[data-exp-cv]');
+      if ((st.layers || []).some(function (L) { return L.behind; }) && !RS.person.ready) el.querySelector('[data-exp-msg]').textContent = 'Loading the person cut-out, then recording on your device… keep this tab open.';
       RS.exportClip(M, plan, { quality: st.quality, music: RS.musicFiles[C.id] || null, signal: signal, onProgress: function (f, canvas) {
         el.querySelector('[data-exp-bar]').style.width = Math.round(f * 100) + '%';
         var r = 320 / canvas.height; cv.width = Math.round(canvas.width * r); cv.height = 320; cv.getContext('2d').drawImage(canvas, 0, 0, cv.width, cv.height);
@@ -2958,6 +3564,33 @@
         var ta = view.querySelector('[data-led] textarea'); if (ta) { ta.focus(); ta.select(); }
         return;
       }
+      if ((b = t.closest('[data-add-card]'))) {
+        var ck = RS.CARDS.filter(function (x) { return x.key === b.getAttribute('data-add-card'); })[0];
+        addLayer(RS.newLayer('card', ck.v, { card: ck.key, sub: ck.sub, icon: ck.icon, fill: ck.fill, anim: ck.key === 'prompt' ? 'type' : 'pop', upper: false }), null);
+        if (ck.key === 'prompt') { var cl = selLayer(); if (cl) cl.e = +(cl.s + Math.min(4, plan.outDur - cl.s)).toFixed(2); }
+        return;
+      }
+      if (t.closest('[data-add-mag]')) {
+        var mw = (String(P.title || C.title).split(/\s+/).filter(function (x) { return x.length > 2; })[0] || 'Reels').replace(/[^\p{L}\p{N}]/gu, '').slice(0, 12) || 'REELS';
+        addLayer(RS.newLayer('text', mw, { ts: 'magazine', font: 'Playfair Display', fill: '#FFFFFF', line: '#FFFFFF', y: 0.15, size: 1.7, rot: 0, behind: true, all: true, anim: 'fade' }));
+        return;
+      }
+      if (t.closest('[data-add-behind]')) {
+        var bt = (st.hook || C.title || 'Watch this').replace(/[.!?…]+$/, '').slice(0, 40);
+        addLayer(RS.newLayer('text', bt, { ts: 'plain', font: 'Anton', y: 0.2, size: 1.6, rot: 0, behind: true, anim: 'zoom' }));
+        return;
+      }
+      if ((b = t.closest('[data-lword]'))) {
+        var Lw = selLayer(); if (!Lw) return;
+        pinLayer(Lw, +b.getAttribute('data-lword'), b.getAttribute('data-wtext')); layersChanged(true);
+        if (player) player.seekOut(Math.max(0, Lw.s - 0.4)).then(function () { player.play(); });
+        return;
+      }
+      if (t.closest('[data-lunpin]')) { var Lu = selLayer(); if (Lu) { delete Lu.at; delete Lu.word; layersChanged(true); } return; }
+      if ((b = t.closest('[data-wordpop]'))) { wordPopModal(+b.getAttribute('data-wordpop'), b.getAttribute('data-wtext')); return; }
+      if (t.closest('[data-board]')) { boardModal(); return; }
+      if ((b = t.closest('[data-grade]'))) { set('grade', b.getAttribute('data-grade'), true); return; }
+      if (t.closest('[data-pip-x]')) { setPipFile(null); return; }
       if ((b = t.closest('[data-add-emoji]'))) { addLayer(RS.newLayer('emoji', b.getAttribute('data-add-emoji'))); return; }
       if ((b = t.closest('[data-add-badge]'))) { var bd = RS.BADGES[+b.getAttribute('data-add-badge')]; addLayer(RS.newLayer('badge', bd.v, { shape: bd.shape, fill: bd.fill, rot: -6 })); return; }
       if ((b = t.closest('[data-add-shape]'))) { var sk = b.getAttribute('data-add-shape'); addLayer(RS.newLayer('shape', sk, { fill: SHAPE_COLOR[sk], loop: 'none' })); return; }
@@ -3035,6 +3668,7 @@
     });
     view.addEventListener('change', function (e) {
       var t = e.target, k = t.getAttribute('data-k');
+      if (t.matches('[data-pipfile]')) { var pf = t.files[0]; if (pf) setPipFile(pf); return; }
       if (t.matches('[data-music]')) { var f = t.files[0]; if (f) { RS.musicFiles[C.id] = f; player && player.setMusic(f); set('musicName', f.name.slice(0, 80), true); } return; }
       if (t.matches('[data-subs]')) {
         var sf = t.files[0]; if (!sf) return;
@@ -3047,8 +3681,12 @@
         return;
       }
       if (k === 'srt') { RS.wantSrt = t.checked; return; }
-      if (t.type === 'checkbox' && t.getAttribute('data-lk')) { setLayer(t.getAttribute('data-lk'), t.checked, true); return; }
-      if (t.type === 'checkbox' && k) { set(k, t.checked, ['captions', 'cutSilence', 'cta', 'transScenes'].indexOf(k) >= 0); }
+      if (t.type === 'checkbox' && t.getAttribute('data-lk')) { setLayer(t.getAttribute('data-lk'), t.checked, true); if (t.getAttribute('data-lk') === 'behind' && t.checked) needPerson(true); return; }
+      if (t.type === 'checkbox' && k) {
+        set(k, t.checked, ['captions', 'cutSilence', 'cta', 'transScenes', 'wall'].indexOf(k) >= 0);
+        if (k === 'wall' && t.checked) loadWall();
+        if ((k === 'gradeWipe' || k === 'wall') && t.checked && player) setTimeout(function () { player.seekOut(0).then(function () { player.play(); }); }, k === 'wall' ? 900 : 0);
+      }
     });
     view.addEventListener('keydown', function (e) { if (e.target.matches('[data-title]') && e.key === 'Enter') e.target.blur(); });
     view.addEventListener('focusout', function (e) {
@@ -3077,11 +3715,12 @@
       return M ? RS.loadAnalysis(pid) : null;
     }).then(function (a) {
       A = a; replan(); draw(); wireTrim();
+      needPerson(false); loadWall();
       document.title = C.title + ' · ' + UI.config.name;
       RS._clipPage = { plan: function () { return plan; }, media: function () { return M; }, style: function () { return st; }, clip: function () { return C; },
         selected: function () { return selId; }, boxes: function () { return boxes; } };
     });
-    return { ready: ready, destroy: function () { dead = true; saveSoon.flush(); saveWordsSoon.flush(); if (player) player.destroy(); document.removeEventListener('keydown', onKey); window.removeEventListener('resize', onResize); } };
+    return { ready: ready, destroy: function () { dead = true; saveSoon.flush(); saveWordsSoon.flush(); if (player) player.destroy(); var pv = C && pipVid(); if (pv) pv.pause(); document.removeEventListener('keydown', onKey); window.removeEventListener('resize', onResize); } };
   });
 })();
 
@@ -3231,10 +3870,11 @@
   var esc = UI.esc;
 
   function heroArt() {
-    return '<div class="lp-art" aria-hidden="true"><div class="lp-long"><img data-long alt=""><div class="tl">' +
-      '<i style="left:8%;width:14%;background:#FF3D8B"></i><i style="left:38%;width:18%;background:#C6F432"></i><i style="left:70%;width:12%;background:#7B5CFF"></i></div></div>' +
-      '<span class="lp-snip">✂️</span>' +
-      '<div class="lp-reel r1"><canvas data-reel="0"></canvas></div><div class="lp-reel r2"><canvas data-reel="1"></canvas></div><div class="lp-reel r3"><canvas data-reel="2"></canvas></div></div>';
+    return '<div class="lp-ba" data-ba><div class="side lp-long" aria-hidden="true"><img data-long alt=""><span class="len">1:12:40 · episode 48</span><div class="tl">' +
+      '<i style="left:8%;width:14%;background:#FF3D8B"></i><i style="left:38%;width:18%;background:#C6F432"></i><i style="left:70%;width:12%;background:#7B5CFF"></i><b></b></div></div>' +
+      '<div class="side lp-cuts" aria-hidden="true"><div class="lp-reel"><canvas data-reel="0"></canvas></div><div class="lp-reel"><canvas data-reel="1"></canvas></div><div class="lp-reel"><canvas data-reel="2"></canvas></div></div>' +
+      '<span class="lbl l" aria-hidden="true">One long video</span><span class="lbl r" aria-hidden="true">Three reels, ready to post</span>' +
+      '<input type="range" min="0" max="100" value="50" aria-label="Drag to compare the long video with the reels cut from it"><span class="handle"></span></div>';
   }
   function drawArt(view) {
     var img = view.querySelector('[data-long]'); if (img) img.src = RS.demoSource().toDataURL('image/png');
@@ -3249,7 +3889,7 @@
     var me = ctx.me, C = COPY;
     var strip = C.strip.map(function (s) { return '<span>✦</span>' + esc(s); }).join('');
     view.innerHTML =
-      '<section class="lp-hero"><div class="ui-wrap"><div>' +
+      '<section class="lp-hero"><div class="ui-wrap"><div class="lp-pitch">' +
         '<div class="eyebrow">' + esc(C.eyebrow) + '</div><h1>' + C.title + '</h1><p class="lp-lead">' + esc(C.lead) + '</p>' +
         '<div class="lp-cta"><a class="ui-btn primary lg" href="#home" data-go="home">' + (me ? 'Open the Studio ' : 'Try it free, no sign-up ') + UI.icon('arrow') + '</a>' +
         '<button class="ui-btn lime lg" data-sample-go>🍿 Watch it cut a sample</button></div>' +
@@ -3268,6 +3908,8 @@
       var b = e.target.closest('[data-sample-go]');
       if (b) UI.busy(b, RS.startSample());
     });
+    var ba = view.querySelector('[data-ba]');
+    if (ba) ba.querySelector('input').addEventListener('input', function (e) { ba.style.setProperty('--x', e.target.value + '%'); });
     return RS.fontsReady().then(function () { drawArt(view); });
   });
 })();

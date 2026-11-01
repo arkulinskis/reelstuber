@@ -9,16 +9,19 @@ import re
 from . import common as C
 
 ASPECTS = ["9:16", "1:1", "4:5", "16:9"]
-LAYOUTS = ["fill", "fit", "framed", "split"]
-CAP_STYLES = ["pop", "karaoke", "boxed", "minimal", "neon", "comic"]
+LAYOUTS = ["fill", "fit", "framed", "split", "pip"]
+CAP_STYLES = ["clean", "pop", "karaoke", "boxed", "minimal", "neon", "comic"]
 FONTS = ["Anton", "Bricolage Grotesque", "DM Sans", "Bangers", "Luckiest Guy", "Bungee", "Titan One", "Lilita One",
-         "Permanent Marker", "Pacifico", "Rubik Mono One"]
+         "Permanent Marker", "Pacifico", "Rubik Mono One", "Playfair Display"]
 CORNERS = ["tl", "tr", "bl", "br", "off"]
 TRANS = ["none", "fade", "flash", "zoom", "whip", "glitch", "shake", "spin", "pixel"]
+# Colour grades, drawn with canvas blend modes in RS.grade (web/pages/_c_engine.html).
+GRADES = ["none", "warm", "moody", "cool", "teal", "vivid", "film", "bw"]
 
 # Text and stickers placed on the reel (style["layers"]). Times are seconds of the finished reel.
-LAYER_TYPES = ["text", "emoji", "badge", "shape"]
-TEXT_STYLES = ["outline", "hollow", "double", "pop3d", "glow", "sticker", "marker", "plain"]
+LAYER_TYPES = ["text", "emoji", "badge", "shape", "card"]
+TEXT_STYLES = ["outline", "hollow", "double", "pop3d", "glow", "sticker", "marker", "plain", "magazine"]
+CARDS = ["label", "repo", "prompt"]
 BADGE_SHAPES = ["burst", "pill", "bubble", "circle"]
 SHAPES = ["arrow", "ring", "underline", "sparkles", "heart", "star"]
 ANIMS = ["none", "pop", "fade", "slide", "drop", "spin", "type", "zoom"]
@@ -29,6 +32,10 @@ LAYER_SPEC = {
     "s": ("num", 0, 900), "e": ("num", 0, 900), "all": ("bool",),
     "anim": ("enum", ANIMS), "loop": ("enum", LOOPS), "font": ("enum", FONTS), "ts": ("enum", TEXT_STYLES),
     "fill": ("color",), "line": ("color",), "shape": ("enum", BADGE_SHAPES), "upper": ("bool",),
+    # behind = drawn behind the person (cut-out); at = pinned to the word said at this source second (word = that word);
+    # cards (tool label, repo card, prompt bar) have a second line (sub), an emoji icon and a card kind.
+    "behind": ("bool",), "at": ("num", 0, 86400), "word": ("str", 40),
+    "sub": ("str", 120), "icon": ("str", 8), "card": ("enum", CARDS),
 }
 
 SPEC = {
@@ -47,6 +54,8 @@ SPEC = {
     "quality": ("enum", ["720", "1080"]),
     "transIn": ("enum", TRANS), "transOut": ("enum", TRANS), "transCut": ("enum", TRANS), "transLen": ("num", 0.15, 1),
     "transScenes": ("bool",), "layers": ("layers",),
+    "grade": ("enum", GRADES), "gradeAmt": ("num", 0, 1), "gradeWipe": ("bool",),
+    "pipPos": ("enum", ["tl", "tr", "bl", "br"]), "pipSize": ("num", 0.25, 0.6), "pipName": ("str", 80), "wall": ("bool",),
 }
 KIT_EXTRA = {"hashtags": ("str", 200)}
 COLOR = re.compile(r"^#[0-9a-fA-F]{6}$")
