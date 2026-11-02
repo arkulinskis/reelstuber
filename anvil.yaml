@@ -474,20 +474,39 @@ metadata:
 name: Reelstuber
 native_deps:
   head_html: "<script src=\"_/theme/legal-kit.js?v=1de57c16dd\"></script>\n<!-- seo:start (APP_MAKER/seo: edit seo/apps/reelstuber.json\
-    \ and run seo.py, not here) -->\n<meta name=\"robots\" content=\"index, follow, max-image-preview:large, max-snippet:-1,\
-    \ max-video-preview:-1\">\n<meta name=\"keywords\" content=\"long video to shorts, video to reels, YouTube Shorts maker,\
-    \ TikTok clip maker, auto captions, podcast clips, 9:16 reframe, clip finder, browser video editor\">\n<meta name=\"author\"\
-    \ content=\"Arkvital\">\n<meta property=\"og:type\" content=\"website\">\n<meta property=\"og:site_name\" content=\"Reelstuber\"\
-    >\n<meta property=\"og:title\" content=\"Reelstuber: turn long videos into reels in your browser\">\n<meta property=\"\
-    og:description\" content=\"Drop in a long video: Reelstuber finds the best moments, reframes them to 9:16, adds word-by-word\
-    \ captions and exports MP4 reels. Nothing is uploaded.\">\n<meta property=\"og:locale\" content=\"en_CA\">\n<meta name=\"\
-    twitter:card\" content=\"summary\">\n<meta name=\"twitter:title\" content=\"Reelstuber: turn long videos into reels in\
-    \ your browser\">\n<meta name=\"twitter:description\" content=\"Drop in a long video: Reelstuber finds the best moments,\
-    \ reframes them to 9:16, adds word-by-word captions and exports MP4 reels. Nothing is uploaded.\">\n<!-- seo:end -->\n\
-    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1, viewport-fit=cover\">\n<meta name=\"theme-color\"\
-    \ content=\"#FFF7EC\">\n<meta name=\"apple-mobile-web-app-capable\" content=\"yes\">\n<link rel=\"preconnect\" href=\"\
-    https://fonts.googleapis.com\">\n<link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n<link href=\"\
-    https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=DM+Sans:opsz,wght@9..40,400..700&family=Anton&family=Bangers&family=Luckiest+Guy&family=Bungee&family=Titan+One&family=Lilita+One&family=Permanent+Marker&family=Pacifico&family=Rubik+Mono+One&family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap\"\
+    \ and run seo.py, not here) -->\n<link rel=\"canonical\" href=\"https://reelstuber.anvil.app/\">\n<meta name=\"robots\"\
+    \ content=\"index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1\">\n<meta name=\"keywords\" content=\"\
+    long video to shorts, video to reels, YouTube Shorts maker, TikTok clip maker, auto captions, podcast clips, 9:16 reframe,\
+    \ clip finder, browser video editor\">\n<meta name=\"author\" content=\"Arkvital\">\n<meta property=\"og:type\" content=\"\
+    website\">\n<meta property=\"og:site_name\" content=\"Reelstuber\">\n<meta property=\"og:title\" content=\"Reelstuber:\
+    \ turn long videos into reels in your browser\">\n<meta property=\"og:description\" content=\"Drop in a long video: Reelstuber\
+    \ finds the best moments, reframes them to 9:16, adds word-by-word captions and exports MP4 reels. Nothing is uploaded.\"\
+    >\n<meta property=\"og:locale\" content=\"en_CA\">\n<meta property=\"og:url\" content=\"https://reelstuber.anvil.app/\"\
+    >\n<meta property=\"og:image\" content=\"https://reelstuber.anvil.app/_/theme/og-image.png\">\n<meta property=\"og:image:width\"\
+    \ content=\"1200\"><meta property=\"og:image:height\" content=\"630\">\n<meta property=\"og:image:alt\" content=\"Reelstuber:\
+    \ Turn one long video into reels, Shorts and TikToks, in your browser\">\n<meta name=\"twitter:card\" content=\"summary_large_image\"\
+    >\n<meta name=\"twitter:title\" content=\"Reelstuber: turn long videos into reels in your browser\">\n<meta name=\"twitter:description\"\
+    \ content=\"Drop in a long video: Reelstuber finds the best moments, reframes them to 9:16, adds word-by-word captions\
+    \ and exports MP4 reels. Nothing is uploaded.\">\n<meta name=\"twitter:image\" content=\"https://reelstuber.anvil.app/_/theme/og-image.png\"\
+    >\n<link rel=\"alternate\" type=\"text/plain\" title=\"Reelstuber for AI assistants\" href=\"https://reelstuber.anvil.app/llms.txt\"\
+    >\n<script type=\"application/ld+json\">{\"@context\": \"https://schema.org\", \"@graph\": [{\"@type\": \"WebApplication\"\
+    , \"@id\": \"https://reelstuber.anvil.app/#app\", \"name\": \"Reelstuber\", \"url\": \"https://reelstuber.anvil.app/\"\
+    , \"description\": \"Drop in a long video: Reelstuber finds the best moments, reframes them to 9:16, adds word-by-word\
+    \ captions and exports MP4 reels. Nothing is uploaded.\", \"image\": \"https://reelstuber.anvil.app/_/theme/og-image.png\"\
+    , \"inLanguage\": \"en\", \"publisher\": {\"@id\": \"https://arkvital.com/#org\"}, \"keywords\": \"long video to shorts,\
+    \ video to reels, YouTube Shorts maker, TikTok clip maker, auto captions, podcast clips, 9:16 reframe, clip finder, browser\
+    \ video editor\", \"applicationCategory\": \"MultimediaApplication\", \"operatingSystem\": \"Any (web browser)\", \"browserRequirements\"\
+    : \"Requires JavaScript and a modern web browser\", \"featureList\": [\"Finds the best 15 to 90 second moments, scored\
+    \ and labelled\", \"Reframes to 9:16 for Reels, TikTok and Shorts\", \"Animated word-by-word captions\", \"Exports MP4\
+    \ in the browser; the video is never uploaded\", \"Brand kit and a templates gallery\"], \"audience\": {\"@type\": \"\
+    Audience\", \"audienceType\": \"YouTubers, podcasters and streamers\"}}, {\"@type\": \"WebSite\", \"@id\": \"https://reelstuber.anvil.app/#site\"\
+    , \"url\": \"https://reelstuber.anvil.app/\", \"name\": \"Reelstuber\", \"publisher\": {\"@id\": \"https://arkvital.com/#org\"\
+    }}, {\"@type\": \"Organization\", \"@id\": \"https://arkvital.com/#org\", \"name\": \"Arkvital\", \"url\": \"https://arkvital.com\"\
+    , \"email\": \"arkvital@outlook.com\", \"address\": {\"@type\": \"PostalAddress\", \"addressLocality\": \"Montreal\",\
+    \ \"addressRegion\": \"QC\", \"addressCountry\": \"CA\"}}]}</script>\n<!-- seo:end -->\n<meta name=\"viewport\" content=\"\
+    width=device-width, initial-scale=1, viewport-fit=cover\">\n<meta name=\"theme-color\" content=\"#FFF7EC\">\n<meta name=\"\
+    apple-mobile-web-app-capable\" content=\"yes\">\n<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n<link\
+    \ rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n<link href=\"https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=DM+Sans:opsz,wght@9..40,400..700&family=Anton&family=Bangers&family=Luckiest+Guy&family=Bungee&family=Titan+One&family=Lilita+One&family=Permanent+Marker&family=Pacifico&family=Rubik+Mono+One&family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap\"\
     \ rel=\"stylesheet\">\n<link id=\"ui-favicon\" rel=\"icon\" type=\"image/svg+xml\" href=\"_/theme/icon.svg?v=40d604cc54\"\
     >\n<link rel=\"apple-touch-icon\" href=\"_/theme/icon-180.png?v=40d604cc54\">\n<script>\n/* Keep our tab icon: Anvil adds\
     \ its own <link rel=\"icon\">, so drop any other icon link. */\n(function () {\n  function keep() {\n    var ours = document.getElementById('ui-favicon');\n\

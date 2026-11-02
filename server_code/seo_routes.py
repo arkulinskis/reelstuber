@@ -57,8 +57,8 @@ SEO = {
    "No. Guests can use the studio; an account keeps projects across devices."
   ]
  ],
- "site": "",
- "updated": "2026-10-31",
+ "site": "https://reelstuber.anvil.app",
+ "updated": "2026-11-01",
  "icon": "icon-512.png",
  "colors": {
   "bg": "#FFF7EC",
