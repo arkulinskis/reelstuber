@@ -1,0 +1,15 @@
+---
+custom_component: true
+properties:
+  - name: label
+    type: string
+    default_value: ""
+    description: What the picture shows, for screen readers (empty = decorative)
+toolbox_item:
+  title: Reel preview
+  group: Reelstuber
+help_text: |
+  A still of a reel drawn by the app's own renderer (RS.stylePreview in rs-engine.js) with a stand-in video.
+  Call draw(style, opts) with a style dict (rs.full_style) and options such as {"width": 180, "hook": "", "t": 1.4}.
+---
+<div class="rs-preview"><canvas anvil:dom-node="canvas"></canvas></div>

@@ -1,0 +1,96 @@
+<anvil-form layout="Reelstuber.Layouts.Shell">
+  <anvil-block slot="content">
+    <div class="ui-wrap">
+      <div class="ui-page-head"><div><h1>Admin</h1><p class="muted">Only admins see this page.</p></div></div>
+      <nav class="ui-tabs">
+        <a href="#admin/overview" anvil:name="tab_overview"><i class="ic ic-grid"></i>Overview</a>
+        <a href="#admin/usage" anvil:name="tab_usage"><i class="ic ic-trophy"></i>Usage</a>
+        <a href="#admin/templates" anvil:name="tab_templates"><i class="ic ic-palette"></i>Templates</a>
+        <a href="#admin/feedback" anvil:name="tab_feedback"><i class="ic ic-inbox"></i>Feedback</a>
+        <a href="#admin/users" anvil:name="tab_users"><i class="ic ic-users"></i>Users</a>
+        <a href="#admin/demo" anvil:name="tab_demo"><i class="ic ic-database"></i>Demo data</a>
+      </nav>
+
+      <div anvil:name="overview_part">
+        <div class="ad-stats">
+          <a class="ui-card ui-stat ad-stat" href="#admin/users"><anvil-component type="Label" name="s_users" prop:role='["stat-num"]'></anvil-component><span>people signed up</span></a>
+          <a class="ui-card ui-stat ad-stat" href="#admin/users"><anvil-component type="Label" name="s_admins" prop:role='["stat-num"]'></anvil-component><anvil-component type="Label" name="s_admins_label" prop:role='["t"]'></anvil-component></a>
+          <a class="ui-card ui-stat ad-stat" href="#admin/feedback"><anvil-component type="Label" name="s_feedback" prop:role='["stat-num"]'></anvil-component><span>new feedback</span></a>
+          <a class="ui-card ui-stat ad-stat" href="#admin/usage"><anvil-component type="Label" name="s_projects" prop:role='["stat-num"]'></anvil-component><span>projects</span></a>
+          <a class="ui-card ui-stat ad-stat" href="#admin/usage"><anvil-component type="Label" name="s_clips" prop:role='["stat-num"]'></anvil-component><span>clips</span></a>
+          <a class="ui-card ui-stat ad-stat" href="#admin/usage"><anvil-component type="Label" name="s_exports" prop:role='["stat-num"]'></anvil-component><span>reels exported</span></a>
+          <a class="ui-card ui-stat ad-stat" href="#admin/templates"><anvil-component type="Label" name="s_templates" prop:role='["stat-num"]'></anvil-component><span>shared templates</span></a>
+        </div>
+        <anvil-component type="Label" name="demo_line" prop:role='["fine-print", "ad-demo-line"]'></anvil-component>
+      </div>
+
+      <div anvil:name="usage_part">
+        <div class="ad-stats ad-usage-stats">
+          <div class="ui-card ui-stat"><anvil-component type="Label" name="u_total" prop:role='["stat-num"]'></anvil-component><span>reels in the last 14 days</span></div>
+          <div class="ui-card ui-stat"><anvil-component type="Label" name="u_avg" prop:role='["stat-num"]'></anvil-component><span>average reel length</span></div>
+          <div class="ui-card ui-stat"><anvil-component type="Label" name="u_captioned" prop:role='["stat-num"]'></anvil-component><span>of clips have captions</span></div>
+        </div>
+        <div class="ui-card ad-chart">
+          <h3>Reels exported per day</h3>
+          <anvil-component type="RepeatingPanel" name="bars_panel" prop:item_template="Reelstuber.Items.UsageBar" prop:role='["ad-bars"]'></anvil-component>
+          <anvil-component type="Label" name="u_demo" prop:role='["fine-print"]'></anvil-component>
+        </div>
+        <div class="ui-grid two">
+          <div class="ui-card"><h3>Popular looks</h3>
+            <anvil-component type="RepeatingPanel" name="looks_panel" prop:item_template="Reelstuber.Items.CountRow"></anvil-component>
+            <p class="muted" anvil:name="no_looks">No exports yet.</p>
+          </div>
+          <div class="ui-card"><h3>Shapes</h3>
+            <anvil-component type="RepeatingPanel" name="aspects_panel" prop:item_template="Reelstuber.Items.CountRow"></anvil-component>
+            <p class="muted" anvil:name="no_aspects">No exports yet.</p>
+          </div>
+        </div>
+      </div>
+
+      <div anvil:name="templates_part">
+        <p class="muted">Templates people shared to the public gallery. Feature the best ones (they show first); hide anything that shouldn&#39;t be there.</p>
+        <anvil-component type="RepeatingPanel" name="templates_panel" prop:item_template="Reelstuber.Items.AdminTemplateRow" prop:role='["ad-fb"]'></anvil-component>
+        <div class="ui-empty" anvil:name="no_templates"><i class="ic ic-palette"></i><h2>No templates yet</h2></div>
+      </div>
+
+      <div anvil:name="feedback_part">
+        <div class="ui-row ad-filter">
+          <div class="ui-seg">
+            <anvil-component type="Button" name="f_new" prop:text="New" prop:role='["seg"]'></anvil-component>
+            <anvil-component type="Button" name="f_read" prop:text="Read" prop:role='["seg"]'></anvil-component>
+            <anvil-component type="Button" name="f_done" prop:text="Done" prop:role='["seg"]'></anvil-component>
+            <anvil-component type="Button" name="f_all" prop:text="All" prop:role='["seg"]'></anvil-component>
+          </div>
+        </div>
+        <anvil-component type="RepeatingPanel" name="feedback_panel" prop:item_template="Reelstuber.Items.FeedbackRow" prop:role='["ad-fb"]'></anvil-component>
+        <div class="ui-empty" anvil:name="no_feedback">
+          <i class="ic ic-inbox"></i>
+          <h2>No messages here</h2>
+          <p>New feedback goes to Prepsto (prepsto.com). Older messages and requests from the app show up here.</p>
+        </div>
+      </div>
+
+      <div anvil:name="users_part">
+        <div class="ui-row ad-search">
+          <anvil-component type="TextBox" name="search_box" prop:placeholder="Search by name or email" prop:role='["ad-search-box"]'></anvil-component>
+          <anvil-component type="Button" name="search_button" prop:text="Search" prop:role='["btn", "ic-search"]'></anvil-component>
+          <anvil-component type="Label" name="users_count" prop:role='["fine-print"]'></anvil-component>
+        </div>
+        <div class="ad-table ad-users-head"><b>Name</b><b>Email</b><b>Joined</b><b>Admin</b><b>Active</b></div>
+        <anvil-component type="RepeatingPanel" name="users_panel" prop:item_template="Reelstuber.Items.UserRow"></anvil-component>
+      </div>
+
+      <div anvil:name="demo_part">
+        <div class="ui-card ui-narrow ad-demo">
+          <h3>Demo data</h3>
+          <p class="muted">Example people and content, so the app never looks empty for the first visitors. Demo rows are flagged, so removing them never touches real data. Once removed, it stays removed until you load it again.</p>
+          <anvil-component type="Label" name="demo_status"></anvil-component>
+          <div class="ui-row">
+            <anvil-component type="Button" name="demo_load_button" prop:text="Load demo data" prop:role='["btn", "btn-primary", "ic-refresh"]'></anvil-component>
+            <anvil-component type="Button" name="demo_remove_button" prop:text="Remove demo data" prop:role='["btn", "btn-danger", "ic-trash"]'></anvil-component>
+          </div>
+        </div>
+      </div>
+    </div>
+  </anvil-block>
+</anvil-form>

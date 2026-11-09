@@ -1,0 +1,211 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Reelstuber sample maker</title>
+<body style="margin:0;background:#111;color:#eee;font:14px sans-serif">
+<canvas id="c" width="640" height="360" style="display:block"></canvas>
+<pre id="out">recording…</pre>
+<script>
+/* Makes assets/sample.webm + assets/sample.json: a fictional ~60 s "Snack Lab with Pip" episode.
+   Pip is an original blob mascot; the voice is chirpy synthesized babble whose syllables follow the
+   script word by word, so sample.json holds an exact word-timed transcript for the caption demo.
+   The show has scene cuts (wide / close-up shots), a loud "hype" part with a beat, a laugh and pauses,
+   so the app's auto-cut has real things to find. Run with tools/sample/make_sample.py. */
+var SCENES = [
+  { bg: '#FF8FC1', body: '#7B5CFF', loud: .42, pitch: 250, shot: 3.6, text: 'Hey hey, welcome back to Snack Lab! I\'m Pip, and today we are testing weird snacks from the corner store. Grab a spoon. Or don\'t.' },
+  { bg: '#8FD3FF', body: '#FF5C8A', loud: .34, pitch: 220, shot: 7, text: 'So, quick story. Last week I tried to make chips in the microwave. The smoke alarm sang for twenty minutes. My neighbor now calls me Chef Smoke.', laugh: true },
+  { bg: '#D8FF5C', body: '#FF3D8B', loud: 1, pitch: 330, shot: 1.5, hype: true, text: 'Okay okay, snack number one. Pickle flavored popcorn. I was ready to hate it. But this is incredible! Ten out of ten! Best snack ever!' },
+  { bg: '#B9A6FF', body: '#FFB23D', loud: .3, pitch: 210, shot: 8, text: 'Here is the secret nobody tells you. Pickle popcorn is better cold. Put it in the fridge for one hour. Trust me on this one.' },
+  { bg: '#FFB86B', body: '#2EC4B6', loud: .5, pitch: 260, shot: 3.2, text: 'Snack number two is a mystery. Comment your guess below, and follow so you do not miss part two. Bye for now!' }
+];
+var VOWELS = { a: [800, 1250], e: [480, 1900], i: [310, 2300], o: [520, 900], u: [360, 820], y: [330, 2100] };
+var W = 640, H = 360;
+var c = document.getElementById('c'), g = c.getContext('2d');
+
+function syllables(word) {
+  var groups = word.toLowerCase().replace(/[^a-z]/g, '').match(/[aeiouy]+/g) || ['a'];
+  return groups.slice(0, 4).map(function (s) { return s[0]; });
+}
+
+/* ---------- the timeline: words, pauses, scene boundaries */
+function plan() {
+  var t = 0.7, words = [], scenes = [], laughs = [];
+  SCENES.forEach(function (sc, si) {
+    var start = t - (si ? 0.35 : 0.7);
+    var rate = sc.hype ? 0.118 : 0.142;
+    sc.text.split(/\s+/).forEach(function (w) {
+      var syl = syllables(w), dur = syl.length * rate + 0.05;
+      words.push({ s: +t.toFixed(3), e: +(t + dur).toFixed(3), w: w, syl: syl, scene: si });
+      t += dur + 0.045;
+      if (/[,]$/.test(w)) t += 0.22;
+      if (/[.!?]$/.test(w)) t += sc.hype ? 0.28 : 0.55;
+    });
+    if (sc.laugh) { laughs.push(t + 0.1); t += 1.4; }
+    t += 0.7;
+    scenes.push({ s: start, e: t - 0.35, i: si });
+  });
+  scenes[scenes.length - 1].e = t + 0.8;
+  return { words: words, scenes: scenes, laughs: laughs, duration: t + 0.8 };
+}
+
+/* ---------- audio */
+function voice(ctx, out, when, vowel, pitch, dur, gain) {
+  var f = VOWELS[vowel] || VOWELS.a;
+  var o = ctx.createOscillator(); o.type = 'sawtooth';
+  o.frequency.setValueAtTime(pitch * (0.92 + Math.random() * 0.2), when);
+  o.frequency.linearRampToValueAtTime(pitch * (0.85 + Math.random() * 0.35), when + dur);
+  var b1 = ctx.createBiquadFilter(); b1.type = 'bandpass'; b1.frequency.value = f[0]; b1.Q.value = 5;
+  var b2 = ctx.createBiquadFilter(); b2.type = 'bandpass'; b2.frequency.value = f[1]; b2.Q.value = 7;
+  var env = ctx.createGain(); env.gain.setValueAtTime(0.0001, when);
+  env.gain.exponentialRampToValueAtTime(gain, when + 0.018);
+  env.gain.setValueAtTime(gain, when + dur * 0.6);
+  env.gain.exponentialRampToValueAtTime(0.0001, when + dur);
+  o.connect(b1); o.connect(b2); b1.connect(env); b2.connect(env); env.connect(out);
+  o.start(when); o.stop(when + dur + 0.02);
+}
+function noiseBuffer(ctx, secs) {
+  var b = ctx.createBuffer(1, ctx.sampleRate * secs, ctx.sampleRate), d = b.getChannelData(0);
+  for (var i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+  return b;
+}
+function kick(ctx, out, when) {
+  var o = ctx.createOscillator(), gn = ctx.createGain();
+  o.frequency.setValueAtTime(140, when); o.frequency.exponentialRampToValueAtTime(45, when + 0.16);
+  gn.gain.setValueAtTime(0.9, when); gn.gain.exponentialRampToValueAtTime(0.001, when + 0.2);
+  o.connect(gn); gn.connect(out); o.start(when); o.stop(when + 0.22);
+}
+function hat(ctx, out, nb, when) {
+  var s = ctx.createBufferSource(); s.buffer = nb;
+  var hp = ctx.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 7000;
+  var gn = ctx.createGain(); gn.gain.setValueAtTime(0.25, when); gn.gain.exponentialRampToValueAtTime(0.001, when + 0.05);
+  s.connect(hp); hp.connect(gn); gn.connect(out); s.start(when, Math.random()); s.stop(when + 0.06);
+}
+function bass(ctx, out, when, f) {
+  var o = ctx.createOscillator(), gn = ctx.createGain(), lp = ctx.createBiquadFilter();
+  o.type = 'square'; o.frequency.value = f; lp.type = 'lowpass'; lp.frequency.value = 600;
+  gn.gain.setValueAtTime(0.18, when); gn.gain.exponentialRampToValueAtTime(0.001, when + 0.24);
+  o.connect(lp); lp.connect(gn); gn.connect(out); o.start(when); o.stop(when + 0.26);
+}
+function schedule(ctx, out, P, t0) {
+  var nb = noiseBuffer(ctx, 2);
+  var room = ctx.createBufferSource(); room.buffer = nb; room.loop = true;
+  var lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 900;
+  var rg = ctx.createGain(); rg.gain.value = 0.006; room.connect(lp); lp.connect(rg); rg.connect(out); room.start(t0);
+  P.words.forEach(function (w) {
+    var sc = SCENES[w.scene], per = (w.e - w.s) / w.syl.length;
+    var emph = /!$/.test(w.w) ? 1.25 : 1;
+    w.syl.forEach(function (v, k) {
+      voice(ctx, out, t0 + w.s + k * per, v, sc.pitch * emph * (k === w.syl.length - 1 && /\?$/.test(w.w) ? 1.3 : 1), per * 0.92, 0.55 * sc.loud * emph);
+    });
+  });
+  P.laughs.forEach(function (lt) {
+    for (var k = 0; k < 6; k++) voice(ctx, out, t0 + lt + k * 0.19, 'a', 420 - k * 28, 0.15, 0.5);
+  });
+  var hs = P.scenes[2];
+  var notes = [55, 55, 73.4, 65.4];
+  for (var bt = hs.s + 0.2, n = 0; bt < hs.e - 0.2; bt += 0.25, n++) {
+    if (n % 2 === 0) kick(ctx, out, t0 + bt);
+    else hat(ctx, out, nb, t0 + bt);
+    if (n % 2 === 0) bass(ctx, out, t0 + bt, notes[Math.floor(n / 4) % 4]);
+  }
+}
+
+/* ---------- video */
+var confetti = [];
+for (var i = 0; i < 90; i++) confetti.push({ x: Math.random() * W, y: Math.random() * H, v: 40 + Math.random() * 90, r: Math.random() * 6, c: ['#FF3D8B', '#7B5CFF', '#fff', '#1A1033', '#2EC4B6'][i % 5] });
+
+function blob(cx, cy, r, color, t, mouth, look) {
+  g.save();
+  g.fillStyle = 'rgba(26,16,51,.18)';
+  g.beginPath(); g.ellipse(cx, cy + r * 1.02, r * 0.95, r * 0.18, 0, 0, 7); g.fill();
+  g.beginPath();
+  for (var a = 0; a <= 64; a++) {
+    var ang = a / 64 * Math.PI * 2, wob = 1 + 0.035 * Math.sin(ang * 3 + t * 3) + 0.02 * Math.sin(ang * 5 - t * 4);
+    var x = cx + Math.cos(ang) * r * wob, y = cy + Math.sin(ang) * r * wob * 0.92;
+    a ? g.lineTo(x, y) : g.moveTo(x, y);
+  }
+  g.closePath(); g.fillStyle = color; g.fill();
+  g.lineWidth = Math.max(3, r * 0.05); g.strokeStyle = '#1A1033'; g.stroke();
+  var blink = (t % 3.3) < 0.12 ? 0.1 : 1;
+  [-1, 1].forEach(function (s) {
+    var ex = cx + s * r * 0.32, ey = cy - r * 0.22;
+    g.fillStyle = '#fff'; g.beginPath(); g.ellipse(ex, ey, r * 0.17, r * 0.2 * blink, 0, 0, 7); g.fill(); g.stroke();
+    if (blink > 0.5) { g.fillStyle = '#1A1033'; g.beginPath(); g.arc(ex + look * r * 0.06, ey + r * 0.03, r * 0.08, 0, 7); g.fill(); }
+  });
+  g.fillStyle = '#1A1033';
+  g.beginPath(); g.ellipse(cx, cy + r * 0.25, r * 0.22, Math.max(r * 0.03, r * 0.24 * mouth), 0, 0, 7); g.fill();
+  g.fillStyle = 'rgba(255,255,255,.35)'; g.beginPath(); g.ellipse(cx - r * 0.45, cy - r * 0.5, r * 0.12, r * 0.07, -0.6, 0, 7); g.fill();
+  g.restore();
+}
+function bag(x, y, s, t) {
+  g.save(); g.translate(x, y); g.rotate(Math.sin(t * 1.3) * 0.04);
+  g.fillStyle = '#2EC4B6'; g.strokeStyle = '#1A1033'; g.lineWidth = 4;
+  g.beginPath(); g.moveTo(-s * .5, -s * .7); g.lineTo(s * .5, -s * .7); g.lineTo(s * .44, s * .7); g.lineTo(-s * .44, s * .7); g.closePath(); g.fill(); g.stroke();
+  g.fillStyle = '#fff'; g.font = '900 ' + (s * 0.2) + 'px Arial Black, sans-serif'; g.textAlign = 'center';
+  g.fillText('PICKLE', 0, -s * 0.12); g.fillText('POP', 0, s * 0.14);
+  g.restore();
+}
+function frame(t, P, level) {
+  var sc = P.scenes.filter(function (s) { return t >= s.s && t < s.e; })[0] || P.scenes[P.scenes.length - 1];
+  var S = SCENES[sc.i], local = t - sc.s, shot = Math.floor(local / S.shot), wide = shot % 2 === 0;
+  var shake = S.hype ? (Math.random() - 0.5) * 6 * level : 0;
+  g.save(); g.translate(shake, shake * 0.6);
+  g.fillStyle = S.hype && Math.floor(t * 4) % 2 ? '#C6F432' : S.bg; g.fillRect(-10, -10, W + 20, H + 20);
+  g.fillStyle = 'rgba(255,255,255,.18)';
+  for (var k = 0; k < 9; k++) { g.beginPath(); g.arc((k * 97 + t * 12) % (W + 80) - 40, 40 + (k * 53) % 280, 18 + k % 3 * 10, 0, 7); g.fill(); }
+  var look = Math.sin(t * 0.9);
+  if (wide) {
+    g.fillStyle = '#1A1033'; g.fillRect(0, H * 0.78, W, H * 0.22);
+    g.fillStyle = '#fff3'; g.fillRect(0, H * 0.78, W, 6);
+    blob(W * 0.33, H * 0.5, 95, S.body, t, level, look);
+    bag(W * 0.74, H * 0.62, 90, t);
+  } else {
+    blob(W * 0.5 + (shot % 4 === 1 ? -40 : 40), H * 0.58, 165, S.body, t, level, look);
+  }
+  if (S.hype) confetti.forEach(function (p) {
+    var y = (p.y + t * p.v) % H; g.fillStyle = p.c; g.fillRect((p.x + Math.sin(t + p.r) * 20) % W, y, 7, 11);
+  });
+  g.restore();
+  g.fillStyle = '#1A1033'; g.fillRect(14, 14, 138, 30);
+  g.fillStyle = '#FF3D8B'; g.font = '900 17px Arial Black, sans-serif'; g.textAlign = 'left'; g.fillText('SNACK LAB', 24, 36);
+  g.fillStyle = '#fff'; g.font = '700 13px Arial, sans-serif'; g.fillText('EP. 12', W - 64, 32);
+}
+
+(async function () {
+  var P = plan();
+  var ctx = new AudioContext({ sampleRate: 48000 });
+  await ctx.resume();
+  var dest = ctx.createMediaStreamDestination(), mix = ctx.createGain(); mix.gain.value = 0.9;
+  var an = ctx.createAnalyser(); an.fftSize = 1024;
+  mix.connect(dest); mix.connect(an);
+  var stream = new MediaStream([c.captureStream(30).getVideoTracks()[0], dest.stream.getAudioTracks()[0]]);
+  var mime = ['video/webm;codecs=vp8,opus', 'video/webm'].filter(function (m) { return MediaRecorder.isTypeSupported(m); })[0];
+  var rec = new MediaRecorder(stream, { mimeType: mime, videoBitsPerSecond: 420000, audioBitsPerSecond: 64000 });
+  var chunks = []; rec.ondataavailable = function (e) { if (e.data.size) chunks.push(e.data); };
+  var buf = new Float32Array(1024), level = 0;
+  frame(0, P, 0);
+  rec.start(1000);
+  var t0 = ctx.currentTime + 0.15;
+  schedule(ctx, mix, P, t0);
+  await new Promise(function (done) {
+    function tick() {
+      var t = ctx.currentTime - t0;
+      an.getFloatTimeDomainData(buf);
+      var s = 0; for (var i = 0; i < buf.length; i++) s += buf[i] * buf[i];
+      level = level * 0.5 + Math.min(1, Math.sqrt(s / buf.length) * 9) * 0.5;
+      frame(Math.max(0, t), P, level);
+      if (t >= P.duration) return done();
+      setTimeout(tick, 1000 / 30);
+    }
+    tick();
+  });
+  rec.stop();
+  await new Promise(function (r) { rec.onstop = r; });
+  var blobOut = new Blob(chunks, { type: 'video/webm' });
+  var transcript = { title: 'Snack Lab with Pip, Ep. 12 (sample)', duration: +P.duration.toFixed(2),
+    words: P.words.map(function (w) { return [w.s, w.e, w.w]; }), scenes: P.scenes.map(function (s) { return [+s.s.toFixed(2), +s.e.toFixed(2)]; }) };
+  await fetch('/save?name=sample.webm', { method: 'POST', body: blobOut });
+  await fetch('/save?name=sample.json', { method: 'POST', body: JSON.stringify(transcript) });
+  document.getElementById('out').textContent = 'done ' + blobOut.size + ' bytes, ' + P.duration.toFixed(1) + ' s';
+  await fetch('/done', { method: 'POST' });
+})().catch(function (e) { fetch('/done?error=' + encodeURIComponent(e && e.stack || e), { method: 'POST' }); });
+</script>

@@ -1,0 +1,10 @@
+<div class="bk-tpl-host">
+  <div class="bk-tpl">
+    <span class="bk-tpl-em" aria-hidden="true"><anvil-component type="Label" name="emoji" prop:role='["t"]' bind:text="self.item['emoji']"></anvil-component></span>
+    <div class="grow">
+      <anvil-component type="Label" name="name" prop:role='["strong"]' bind:text="self.item['name']"></anvil-component>
+      <anvil-component type="Label" name="meta" prop:role='["fine-print"]'></anvil-component>
+    </div>
+    <anvil-component type="Button" name="delete_button" prop:text="Delete" prop:role='["btn", "btn-sm", "btn-danger", "ic-trash"]'></anvil-component>
+  </div>
+</div>

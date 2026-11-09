@@ -1,0 +1,57 @@
+<anvil-form layout="Reelstuber.Layouts.Shell">
+  <anvil-block slot="content">
+    <div class="ui-wrap">
+      <div class="st-hero">
+        <div>
+          <anvil-component type="Label" name="hello" prop:role='["st-h1"]'></anvil-component>
+          <p>Drop in a video and we&#39;ll find the moments worth posting.</p>
+        </div>
+        <span class="rs-sticker pink" anvil:name="streak_tag"><i class="ic ic-flame"></i><anvil-component type="Label" name="streak_text" prop:role='["t"]'></anvil-component></span>
+      </div>
+
+      <div class="st-banner" anvil:name="guest_banner">
+        <p>👋 You&#39;re trying Reelstuber without an account. Your projects stay in this browser.</p>
+        <a class="ui-btn sm primary" href="#auth/signup">Sign up to keep them</a>
+      </div>
+      <div class="st-banner" anvil:name="import_banner">
+        <anvil-component type="Label" name="import_text" prop:role='["st-banner-text"]'></anvil-component>
+        <div class="ui-row">
+          <anvil-component type="Button" name="import_no" prop:text="Not now" prop:role='["btn", "btn-sm", "btn-ghost"]'></anvil-component>
+          <anvil-component type="Button" name="import_button" prop:text="Move to my account" prop:role='["btn", "btn-sm", "btn-primary"]'></anvil-component>
+        </div>
+      </div>
+
+      <label class="st-drop" anvil:dom-node="drop">
+        <span class="dz-ic"><i class="ic ic-upload"></i></span>
+        <div><h2>Drop a video here</h2><p>MP4, MOV or WebM, any length. We&#39;ll find the best bits.</p></div>
+        <div class="btns">
+          <span class="ui-btn primary lg"><i class="ic ic-film"></i>Choose a video</span>
+          <button type="button" class="ui-btn lime lg" data-sample>🍿 Try the sample</button>
+        </div>
+        <input type="file" accept="video/*,.mkv,.mov" anvil:dom-node="file" hidden>
+      </label>
+      <div class="st-under">
+        <span class="rs-lock"><i class="ic ic-lock"></i>Your video never leaves this device. We only save your edits.</span>
+        <span class="ui-badge warn" anvil:name="no_export">This browser can&#39;t export video. Use Chrome, Edge or Safari on a computer.</span>
+      </div>
+
+      <div class="st-stats">
+        <div class="st-stat"><anvil-component type="Label" name="s_exports" prop:role='["st-num"]'></anvil-component><span>reels exported</span></div>
+        <div class="st-stat"><anvil-component type="Label" name="s_minutes" prop:role='["st-num"]'></anvil-component><span>minutes of editing saved</span></div>
+        <div class="st-stat"><anvil-component type="Label" name="s_streak" prop:role='["st-num"]'></anvil-component><span>day streak</span></div>
+        <div class="st-stat"><anvil-component type="Label" name="s_projects" prop:role='["st-num"]'></anvil-component><anvil-component type="Label" name="s_projects_label" prop:role='["t"]'></anvil-component></div>
+      </div>
+
+      <div class="st-sec"><h2>Your projects</h2><anvil-component type="Label" name="projects_count" prop:role='["fine-print"]'></anvil-component></div>
+      <anvil-component type="RepeatingPanel" name="projects_panel" prop:item_template="Reelstuber.Items.ProjectCard" prop:role='["st-grid"]'></anvil-component>
+      <div class="ui-empty st-empty" anvil:name="no_projects">
+        <i class="ic ic-film"></i>
+        <h3>No projects yet</h3>
+        <p>Drop a video above, or try the sample to see how it works.</p>
+      </div>
+
+      <div class="st-sec"><h2>Badges</h2><anvil-component type="Label" name="badges_count" prop:role='["fine-print"]'></anvil-component></div>
+      <anvil-component type="RepeatingPanel" name="badges_panel" prop:item_template="Reelstuber.Items.BadgeTile" prop:role='["st-badges"]'></anvil-component>
+    </div>
+  </anvil-block>
+</anvil-form>

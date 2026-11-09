@@ -68,7 +68,7 @@ def clean(style, extra=None):
     if not isinstance(style, dict):
         return out
     for k, v in style.items():
-        rule = spec.get(k)
+        rule: tuple = spec.get(k)  # type: ignore
         if rule is None or v is None:
             continue
         kind = rule[0]

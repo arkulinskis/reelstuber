@@ -1,0 +1,19 @@
+<div class="st-card-host">
+  <a class="st-card" anvil:name="card" href="#home">
+    <div class="st-thumb" anvil:name="thumb">
+      <span class="pip" anvil:name="pip" aria-hidden="true">🍿</span>
+      <i class="ic ic-film st-noimg" anvil:name="noimg"></i>
+      <span class="rs-sticker" anvil:name="sample_tag">🍿 Sample</span>
+      <anvil-component type="Label" name="length" prop:role='["st-len"]'></anvil-component>
+    </div>
+    <div class="body">
+      <anvil-component type="Label" name="title" prop:role='["st-title"]' bind:text="self.item['title']"></anvil-component>
+      <div class="meta">
+        <span class="ui-badge"><i class="ic ic-scissors"></i><anvil-component type="Label" name="clips" prop:role='["t"]'></anvil-component></span>
+        <span class="ui-badge lime" anvil:name="ready_tag"><anvil-component type="Label" name="ready" prop:role='["t"]'></anvil-component></span>
+        <span class="ui-badge brand" anvil:name="exported_tag"><anvil-component type="Label" name="exported" prop:role='["t"]'></anvil-component></span>
+        <anvil-component type="Label" name="when" prop:role='["fine-print"]'></anvil-component>
+      </div>
+    </div>
+  </a>
+</div>

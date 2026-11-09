@@ -1,0 +1,16 @@
+---
+custom_component: true
+properties:
+  - name: screen
+    type: string
+    default_value: ""
+    description: Which editor screen to show (project or clip, in theme/assets/rs-screens.js)
+toolbox_item:
+  title: Editor screen
+  group: Reelstuber
+help_text: |
+  One of Reelstuber's JavaScript editors (the project page with its player and timeline, or the reel editor),
+  mounted when the component appears and destroyed (with a last autosave) when it leaves. Call mount(args) with the
+  address parts.
+---
+<div class="rs-screen-host"><div anvil:dom-node="host"></div></div>
