@@ -473,61 +473,50 @@ metadata:
   title: 'Reelstuber: turn long videos into reels in your browser'
 name: Reelstuber
 native_deps:
-  head_html: |
-    <script src="_/theme/legal-kit.js?v=ab010cfc90"></script>
-    <!-- seo:start (APP_MAKER/seo: edit seo/apps/reelstuber.json and run seo.py, not here) -->
-    <link rel="canonical" href="https://reelstuber.anvil.app/">
-    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
-    <meta name="keywords" content="long video to shorts, video to reels, YouTube Shorts maker, TikTok clip maker, auto captions, podcast clips, 9:16 reframe, clip finder, browser video editor">
-    <meta name="author" content="Arkvital">
-    <meta property="og:type" content="website">
-    <meta property="og:site_name" content="Reelstuber">
-    <meta property="og:title" content="Reelstuber: turn long videos into reels in your browser">
-    <meta property="og:description" content="Drop in a long video: Reelstuber finds the best moments, reframes them to 9:16, adds word-by-word captions and exports MP4 reels. Nothing is uploaded.">
-    <meta property="og:locale" content="en_CA">
-    <meta property="og:url" content="https://reelstuber.anvil.app/">
-    <meta property="og:image" content="https://reelstuber.anvil.app/_/theme/og-image.png">
-    <meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
-    <meta property="og:image:alt" content="Reelstuber: Turn one long video into reels, Shorts and TikToks, in your browser">
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Reelstuber: turn long videos into reels in your browser">
-    <meta name="twitter:description" content="Drop in a long video: Reelstuber finds the best moments, reframes them to 9:16, adds word-by-word captions and exports MP4 reels. Nothing is uploaded.">
-    <meta name="twitter:image" content="https://reelstuber.anvil.app/_/theme/og-image.png">
-    <link rel="alternate" type="text/plain" title="Reelstuber for AI assistants" href="https://reelstuber.anvil.app/llms.txt">
-    <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "WebApplication", "@id": "https://reelstuber.anvil.app/#app", "name": "Reelstuber", "url": "https://reelstuber.anvil.app/", "description": "Drop in a long video: Reelstuber finds the best moments, reframes them to 9:16, adds word-by-word captions and exports MP4 reels. Nothing is uploaded.", "image": "https://reelstuber.anvil.app/_/theme/og-image.png", "inLanguage": "en", "publisher": {"@id": "https://arkvital.com/#org"}, "keywords": "long video to shorts, video to reels, YouTube Shorts maker, TikTok clip maker, auto captions, podcast clips, 9:16 reframe, clip finder, browser video editor", "applicationCategory": "MultimediaApplication", "operatingSystem": "Any (web browser)", "browserRequirements": "Requires JavaScript and a modern web browser", "featureList": ["Finds the best 15 to 90 second moments, scored and labelled", "Reframes to 9:16 for Reels, TikTok and Shorts", "Animated word-by-word captions", "Exports MP4 in the browser; the video is never uploaded", "Brand kit and a templates gallery"], "audience": {"@type": "Audience", "audienceType": "YouTubers, podcasters and streamers"}}, {"@type": "WebSite", "@id": "https://reelstuber.anvil.app/#site", "url": "https://reelstuber.anvil.app/", "name": "Reelstuber", "publisher": {"@id": "https://arkvital.com/#org"}}, {"@type": "Organization", "@id": "https://arkvital.com/#org", "name": "Arkvital", "url": "https://arkvital.com", "email": "arkvital@outlook.com", "address": {"@type": "PostalAddress", "addressLocality": "Montreal", "addressRegion": "QC", "addressCountry": "CA"}}]}</script>
-    <!-- seo:end -->
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <meta name="theme-color" content="#FFF7EC">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=DM+Sans:opsz,wght@9..40,400..700&family=Anton&family=Bangers&family=Luckiest+Guy&family=Bungee&family=Titan+One&family=Lilita+One&family=Permanent+Marker&family=Pacifico&family=Rubik+Mono+One&family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap" rel="stylesheet">
-    <link id="ui-favicon" rel="icon" type="image/svg+xml" href="_/theme/icon.svg?v=8342738492">
-    <link rel="apple-touch-icon" href="_/theme/icon-180.png?v=bf422fc2ce">
-    <script>
-    /* Keep our tab icon: Anvil adds its own <link rel="icon">, so drop any other icon link. */
-    (function () {
-      function keep() {
-        var ours = document.getElementById('ui-favicon');
-        if (!ours) return;
-        document.querySelectorAll('link[rel~="icon"]').forEach(function (l) { if (l !== ours) l.remove(); });
-      }
-      keep();
-      document.addEventListener('DOMContentLoaded', keep);
-      window.addEventListener('load', keep);
-    })();
-    </script>
-
-    <!-- Prepsto feedback panel: every "Submit feedback" link and button opens it (it is the only feedback channel). No floating button, no cookies, nothing loads until it is opened. Codes: APP_MAKER/prepsto-links.json -->
-    <script src="https://prepsto.com/_/theme/widget.js" data-prepsto="m9ke3hk" data-button="false" data-label="Submit feedback" async></script>
-    <link rel="stylesheet" href="_/theme/icons.css?v=30c23a57ea">
-    <link rel="stylesheet" href="_/theme/app.css?v=a51c203765">
-    <script src="_/theme/app-kit.js?v=76398b266e"></script>
-    <script src="_/theme/rs-kit.js?v=020daa7b15"></script>
-    <script src="_/theme/rs-core.js?v=7298f57e22"></script>
-    <script src="_/theme/rs-smart.js?v=2600fb20b1"></script>
-    <script src="_/theme/rs-engine.js?v=3489b193ee"></script>
-    <script src="_/theme/rs-screens.js?v=aa20e0d38d"></script>
+  head_html: "<script src=\"_/theme/legal-kit.js?v=ab010cfc90\"></script>\n<!-- seo:start (APP_MAKER/seo: edit seo/apps/reelstuber.json\
+    \ and run seo.py, not here) -->\n<link rel=\"canonical\" href=\"https://reelstuber.anvil.app/\">\n<meta name=\"robots\"\
+    \ content=\"index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1\">\n<meta name=\"keywords\" content=\"\
+    long video to shorts, video to reels, YouTube Shorts maker, TikTok clip maker, auto captions, podcast clips, 9:16 reframe,\
+    \ clip finder, browser video editor\">\n<meta name=\"author\" content=\"Arkvital\">\n<meta property=\"og:type\" content=\"\
+    website\">\n<meta property=\"og:site_name\" content=\"Reelstuber\">\n<meta property=\"og:title\" content=\"Reelstuber:\
+    \ turn long videos into reels in your browser\">\n<meta property=\"og:description\" content=\"Drop in a long video: Reelstuber\
+    \ finds the best moments, reframes them to 9:16, adds word-by-word captions and exports MP4 reels. Nothing is uploaded.\"\
+    >\n<meta property=\"og:locale\" content=\"en_CA\">\n<meta property=\"og:url\" content=\"https://reelstuber.anvil.app/\"\
+    >\n<meta property=\"og:image\" content=\"https://reelstuber.anvil.app/_/theme/og-image.png\">\n<meta property=\"og:image:width\"\
+    \ content=\"1200\"><meta property=\"og:image:height\" content=\"630\">\n<meta property=\"og:image:alt\" content=\"Reelstuber:\
+    \ Turn one long video into reels, Shorts and TikToks, in your browser\">\n<meta name=\"twitter:card\" content=\"summary_large_image\"\
+    >\n<meta name=\"twitter:title\" content=\"Reelstuber: turn long videos into reels in your browser\">\n<meta name=\"twitter:description\"\
+    \ content=\"Drop in a long video: Reelstuber finds the best moments, reframes them to 9:16, adds word-by-word captions\
+    \ and exports MP4 reels. Nothing is uploaded.\">\n<meta name=\"twitter:image\" content=\"https://reelstuber.anvil.app/_/theme/og-image.png\"\
+    >\n<link rel=\"alternate\" type=\"text/plain\" title=\"Reelstuber for AI assistants\" href=\"https://reelstuber.anvil.app/llms.txt\"\
+    >\n<script type=\"application/ld+json\">{\"@context\": \"https://schema.org\", \"@graph\": [{\"@type\": \"Service\", \"\
+    @id\": \"https://reelstuber.anvil.app/#app\", \"name\": \"Reelstuber\", \"url\": \"https://reelstuber.anvil.app/\", \"\
+    description\": \"Drop in a long video: Reelstuber finds the best moments, reframes them to 9:16, adds word-by-word captions\
+    \ and exports MP4 reels. Nothing is uploaded.\", \"image\": \"https://reelstuber.anvil.app/_/theme/og-image.png\", \"\
+    serviceType\": \"Turn one long video into reels, Shorts and TikToks, in your browser\", \"provider\": {\"@id\": \"https://arkvital.com/#org\"\
+    }, \"areaServed\": \"Worldwide\", \"availableChannel\": {\"@type\": \"ServiceChannel\", \"serviceUrl\": \"https://reelstuber.anvil.app/\"\
+    , \"name\": \"Web browser\"}, \"availableLanguage\": \"en\", \"audience\": {\"@type\": \"Audience\", \"audienceType\"\
+    : \"YouTubers, podcasters and streamers\"}}, {\"@type\": \"WebSite\", \"@id\": \"https://reelstuber.anvil.app/#site\"\
+    , \"url\": \"https://reelstuber.anvil.app/\", \"name\": \"Reelstuber\", \"publisher\": {\"@id\": \"https://arkvital.com/#org\"\
+    }}, {\"@type\": \"Organization\", \"@id\": \"https://arkvital.com/#org\", \"name\": \"Arkvital\", \"url\": \"https://arkvital.com\"\
+    , \"email\": \"arkvital@outlook.com\", \"address\": {\"@type\": \"PostalAddress\", \"addressLocality\": \"Montreal\",\
+    \ \"addressRegion\": \"QC\", \"addressCountry\": \"CA\"}}]}</script>\n<!-- seo:end -->\n<meta name=\"viewport\" content=\"\
+    width=device-width, initial-scale=1, viewport-fit=cover\">\n<meta name=\"theme-color\" content=\"#FFF7EC\">\n<meta name=\"\
+    apple-mobile-web-app-capable\" content=\"yes\">\n<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n<link\
+    \ rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n<link href=\"https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=DM+Sans:opsz,wght@9..40,400..700&family=Anton&family=Bangers&family=Luckiest+Guy&family=Bungee&family=Titan+One&family=Lilita+One&family=Permanent+Marker&family=Pacifico&family=Rubik+Mono+One&family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap\"\
+    \ rel=\"stylesheet\">\n<link id=\"ui-favicon\" rel=\"icon\" type=\"image/svg+xml\" href=\"_/theme/icon.svg?v=8342738492\"\
+    >\n<link rel=\"apple-touch-icon\" href=\"_/theme/icon-180.png?v=bf422fc2ce\">\n<script>\n/* Keep our tab icon: Anvil adds\
+    \ its own <link rel=\"icon\">, so drop any other icon link. */\n(function () {\n  function keep() {\n    var ours = document.getElementById('ui-favicon');\n\
+    \    if (!ours) return;\n    document.querySelectorAll('link[rel~=\"icon\"]').forEach(function (l) { if (l !== ours) l.remove();\
+    \ });\n  }\n  keep();\n  document.addEventListener('DOMContentLoaded', keep);\n  window.addEventListener('load', keep);\n\
+    })();\n</script>\n\n<!-- Prepsto feedback panel: every \"Submit feedback\" link and button opens it (it is the only feedback\
+    \ channel). No floating button, no cookies, nothing loads until it is opened. Codes: APP_MAKER/prepsto-links.json -->\n\
+    <script src=\"https://prepsto.com/_/theme/widget.js\" data-prepsto=\"m9ke3hk\" data-button=\"false\" data-label=\"Submit\
+    \ feedback\" async></script>\n<link rel=\"stylesheet\" href=\"_/theme/icons.css?v=30c23a57ea\">\n<link rel=\"stylesheet\"\
+    \ href=\"_/theme/app.css?v=a51c203765\">\n<script src=\"_/theme/app-kit.js?v=76398b266e\"></script>\n<script src=\"_/theme/rs-kit.js?v=020daa7b15\"\
+    ></script>\n<script src=\"_/theme/rs-core.js?v=7298f57e22\"></script>\n<script src=\"_/theme/rs-smart.js?v=2600fb20b1\"\
+    ></script>\n<script src=\"_/theme/rs-engine.js?v=3489b193ee\"></script>\n<script src=\"_/theme/rs-screens.js?v=aa20e0d38d\"\
+    ></script>\n"
 package_name: Reelstuber
 runtime_options:
   client_version: '3'
