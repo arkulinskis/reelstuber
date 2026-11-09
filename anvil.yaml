@@ -495,7 +495,7 @@ native_deps:
     \ and exports MP4 reels. Nothing is uploaded.\", \"image\": \"https://reelstuber.anvil.app/_/theme/og-image.png\", \"\
     serviceType\": \"Turn one long video into reels, Shorts and TikToks, in your browser\", \"provider\": {\"@id\": \"https://arkvital.com/#org\"\
     }, \"areaServed\": \"Worldwide\", \"availableChannel\": {\"@type\": \"ServiceChannel\", \"serviceUrl\": \"https://reelstuber.anvil.app/\"\
-    , \"name\": \"Web browser\"}, \"availableLanguage\": \"en\", \"audience\": {\"@type\": \"Audience\", \"audienceType\"\
+    , \"name\": \"Web browser\", \"availableLanguage\": \"en\"}, \"audience\": {\"@type\": \"Audience\", \"audienceType\"\
     : \"YouTubers, podcasters and streamers\"}}, {\"@type\": \"WebSite\", \"@id\": \"https://reelstuber.anvil.app/#site\"\
     , \"url\": \"https://reelstuber.anvil.app/\", \"name\": \"Reelstuber\", \"publisher\": {\"@id\": \"https://arkvital.com/#org\"\
     }}, {\"@type\": \"Organization\", \"@id\": \"https://arkvital.com/#org\", \"name\": \"Arkvital\", \"url\": \"https://arkvital.com\"\
