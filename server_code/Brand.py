@@ -88,7 +88,7 @@ def template_use(template_id):
     used = anvil.server.session.get("used_templates") or []
     if template_id not in used and not C.rate_limited("template_use", 60, 3600):
         t["uses"] = (t["uses"] or 0) + 1
-        anvil.server.session["used_templates"] = used + [template_id]
+        getattr(anvil.server, "session")["used_templates"] = used + [template_id]
     return C.ok(template=template_dict(t, C.me()))
 
 

@@ -1,0 +1,16 @@
+<div class="ui-item ad-tpl">
+  <div class="meta">
+    <span class="ad-tpl-em" aria-hidden="true"><anvil-component type="Label" name="emoji" prop:role='["t"]' bind:text="self.item['emoji']"></anvil-component></span>
+    <anvil-component type="Label" name="name" prop:role='["strong"]' bind:text="self.item['name']"></anvil-component>
+    <anvil-component type="Label" name="by" prop:role='["t"]'></anvil-component>
+    <anvil-component type="Label" name="email" prop:role='["t"]'></anvil-component>
+    <span class="ui-badge" anvil:name="demo_tag">Demo</span>
+    <anvil-component type="Label" name="uses" prop:role='["t"]'></anvil-component>
+  </div>
+  <div class="ui-row">
+    <anvil-component type="CheckBox" name="featured_box" prop:text="Featured" bind:checked="self.item['featured']"></anvil-component>
+    <anvil-component type="CheckBox" name="hidden_box" prop:text="Hidden" bind:checked="self.item['hidden']"></anvil-component>
+    <span class="ui-spacer"></span>
+    <anvil-component type="Button" name="delete_button" prop:text="Delete" prop:role='["btn", "btn-sm", "btn-danger", "ic-trash"]'></anvil-component>
+  </div>
+</div>

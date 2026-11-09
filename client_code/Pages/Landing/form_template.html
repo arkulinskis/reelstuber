@@ -1,0 +1,93 @@
+<anvil-form layout="Reelstuber.Layouts.Shell">
+  <anvil-block slot="content">
+    <div class="lp">
+      <section class="lp-hero">
+        <div class="ui-wrap">
+          <div class="lp-pitch">
+            <h1>One long video in.<br><em>A week of reels</em> out.</h1>
+            <p class="lp-lead">For YouTubers, podcasters and streamers: drop in your video. Reelstuber finds the moments worth posting, reframes them to 9:16, adds bouncy word-by-word captions and exports ready-to-post reels. Right on your own device: nothing gets uploaded.</p>
+            <div class="lp-cta">
+              <a class="ui-btn primary lg" href="#home" anvil:name="cta_studio"><span anvil:dom-node="cta_text">Try it free, no sign-up</span> <i class="ic ic-arrow"></i></a>
+              <anvil-component type="Button" name="sample_button" prop:text="🍿 Watch it cut a sample" prop:role='["btn", "btn-lime", "btn-lg"]'></anvil-component>
+            </div>
+            <div class="lp-proof">
+              <span class="rs-sticker">🔒 Your video never leaves your device</span>
+              <span class="rs-sticker pink">🚫 No watermark</span>
+              <span class="rs-sticker plain">⚡ Works in your browser</span>
+            </div>
+          </div>
+          <div class="lp-ba" anvil:dom-node="ba">
+            <div class="side lp-long" aria-hidden="true">
+              <img anvil:dom-node="long_img" alt="">
+              <span class="len">1:12:40 · episode 48</span>
+              <div class="tl"><i class="tl-a"></i><i class="tl-b"></i><i class="tl-c"></i><b></b></div>
+            </div>
+            <div class="side lp-cuts" aria-hidden="true">
+              <div class="lp-reel"><anvil-component type="Reelstuber.Components.StylePreview" name="reel1"></anvil-component></div>
+              <div class="lp-reel"><anvil-component type="Reelstuber.Components.StylePreview" name="reel2"></anvil-component></div>
+              <div class="lp-reel"><anvil-component type="Reelstuber.Components.StylePreview" name="reel3"></anvil-component></div>
+            </div>
+            <span class="lbl l" aria-hidden="true">One long video</span>
+            <span class="lbl r" aria-hidden="true">Three reels, ready to post</span>
+            <input type="range" min="0" max="100" value="50" anvil:dom-node="ba_range" aria-label="Drag to compare the long video with the reels cut from it">
+            <span class="handle"></span>
+          </div>
+        </div>
+      </section>
+
+      <div class="lp-strip" aria-hidden="true"><div><span>✦</span>Find the bangers<span>✦</span>Reframe to 9:16<span>✦</span>Pop-up captions<span>✦</span>Cut the silences<span>✦</span>Hooks &amp; end cards<span>✦</span>No uploads<span>✦</span>No watermark<span>✦</span>Find the bangers<span>✦</span>Reframe to 9:16<span>✦</span>Pop-up captions<span>✦</span>Cut the silences<span>✦</span>Hooks &amp; end cards<span>✦</span>No uploads<span>✦</span>No watermark</div></div>
+
+      <section class="lp-section ytf" id="watch">
+        <div class="ui-wrap">
+          <div class="ytf-in">
+            <div class="ytf-copy">
+              <h2>See Reelstuber in about a minute</h2>
+              <p>A short video tour of what Reelstuber does and how it works.</p>
+              <a class="ytf-link" href="https://www.youtube.com/watch?v=pjALr5WpIvM" target="_blank" rel="noopener"><svg viewBox="0 0 28 20" width="20" height="14" aria-hidden="true"><rect width="28" height="20" rx="5" fill="#FF0033"/><path d="M11.2 5.8v8.4l7.3-4.2z" fill="#fff"/></svg>Watch on YouTube &#8599;</a>
+            </div>
+            <div>
+              <div class="ytf-frame" anvil:dom-node="yt_frame">
+                <button type="button" class="ytf-cover" anvil:dom-node="yt_cover" aria-label="Play the Reelstuber video (1:14)">
+                  <img src="_/theme/yt-cover.jpg" alt="" loading="lazy" decoding="async" width="960" height="540">
+                  <span class="ytf-play" aria-hidden="true"><svg viewBox="0 0 68 48" width="68" height="48"><path d="M66.5 7.7a8.5 8.5 0 0 0-6-6C55.3.3 34 .3 34 .3s-21.3 0-26.5 1.4a8.5 8.5 0 0 0-6 6C.1 13 .1 24 .1 24s0 11 1.4 16.3a8.5 8.5 0 0 0 6 6c5.2 1.4 26.5 1.4 26.5 1.4s21.3 0 26.5-1.4a8.5 8.5 0 0 0 6-6C67.9 35 67.9 24 67.9 24s0-11-1.4-16.3z" fill="#FF0033"/><path d="M45 24 27 14v20z" fill="#fff"/></svg></span>
+                  <span class="ytf-len">1:14</span>
+                </button>
+              </div>
+              <p class="ytf-note">The video loads from YouTube when you press play.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="lp-section" id="how">
+        <div class="ui-wrap">
+          <div class="lp-head"><h2>How it works</h2><p>From a 40-minute video to a stack of reels in a coffee break.</p></div>
+          <div class="lp-steps"><div class="ui-card lp-step"><span class="em" aria-hidden="true">✂️</span><h3>Drop your video</h3><p class="muted">MP4, MOV or WebM, any length. It opens instantly: nothing to upload, no waiting in a queue.</p></div><div class="ui-card lp-step"><span class="em" aria-hidden="true">🔥</span><h3>It finds the bangers</h3><p class="muted">Reelstuber listens for the loud bits, spots scene changes and pauses, and picks the best 15-90 second moments.</p></div><div class="ui-card lp-step"><span class="em" aria-hidden="true">🎨</span><h3>Tweak &amp; export</h3><p class="muted">Drag to reframe, pick a caption style, throw on text, stickers and transitions. Export MP4s ready for Reels, TikTok and Shorts.</p></div></div>
+        </div>
+      </section>
+
+      <section class="lp-section">
+        <div class="ui-wrap">
+          <div class="lp-head"><h2>Everything people ask for</h2></div>
+          <div class="ui-grid lp-features"><div class="ui-card lp-feature"><span class="ft-ic"><i class="ic ic-wand"></i></span><h3>Auto-find the best moments</h3><p>Every clip gets a score and a label: hype spike, story time, quotable, strong hook. Pick a vibe and a length.</p></div><div class="ui-card lp-feature"><span class="ft-ic"><i class="ic ic-crop"></i></span><h3>Smart reframing</h3><p>Fill, fit with a blurred background, a sticker frame, or split screen for podcasts and gameplay. Drag to move, pinch to zoom.</p></div><div class="ui-card lp-feature"><span class="ft-ic"><i class="ic ic-cc"></i></span><h3>Captions that pop</h3><p>Six animated styles with auto emoji. Write them on your device, import your .srt, or type them yourself.</p></div><div class="ui-card lp-feature"><span class="ft-ic"><i class="ic ic-scissors"></i></span><h3>Cut the silences</h3><p>Jump-cut the pauses out in one tap, with a zoom, flash, whip or glitch at every cut.</p></div><div class="ui-card lp-feature"><span class="ft-ic"><i class="ic ic-type"></i></span><h3>Text &amp; stickers</h3><p>Outlined text in 11 fonts, emoji and word stickers, arrows and circles. Drag them anywhere, make them pop in, wiggle or float.</p></div><div class="ui-card lp-feature"><span class="ft-ic"><i class="ic ic-music"></i></span><h3>Background music</h3><p>Add a track from your device. It ducks under speech so your words still land.</p></div><div class="ui-card lp-feature"><span class="ft-ic"><i class="ic ic-palette"></i></span><h3>Brand kit &amp; templates</h3><p>Save your look once. Borrow looks from other creators, or share yours.</p></div><div class="ui-card lp-feature"><span class="ft-ic"><i class="ic ic-list"></i></span><h3>Chapters to clips</h3><p>Paste the timestamps from your YouTube description and get a clip per chapter.</p></div><div class="ui-card lp-feature"><span class="ft-ic"><i class="ic ic-share"></i></span><h3>Post-ready text</h3><p>A caption and hashtags written from what&#39;s said in the clip. Copy, share, done.</p></div></div>
+        </div>
+      </section>
+
+      <section class="lp-section">
+        <div class="ui-wrap">
+          <div class="lp-head"><h2>Questions</h2></div>
+          <div class="lp-faq"><details><summary>Is my video uploaded anywhere?</summary><p>No. Reelstuber cuts, captions and exports your video inside your browser. We only save your edits (clip times, styles, the post text and captions if you make them) so you can come back later. Signed out, even those stay in your browser.</p></details><details><summary>Can I paste a YouTube link?</summary><p>No: YouTube doesn&#39;t let other sites download its videos. Use your own copy instead: in YouTube Studio go to Content, open the ⋮ menu next to the video and choose Download. Only use videos you have the rights to.</p></details><details><summary>Is it free? Is there a watermark?</summary><p>It&#39;s free while we&#39;re growing, and there&#39;s no watermark. Your handle only shows if you add it.</p></details><details><summary>Which browsers work?</summary><p>Editing works in any modern browser. Exporting works best in Chrome, Edge or Safari on a computer. Each reel plays through once while it records, so a 30-second reel takes about 30 seconds.</p></details><details><summary>How do the captions work?</summary><p>Three ways: write them on your device (speech-to-text runs in your browser; the first time it downloads a small model), import an .srt or .vtt file, or type them in. You can edit every word.</p></details><details><summary>Do I need an account?</summary><p>No. Try everything without one: your projects stay in this browser. Sign up to keep them in your account, save a brand kit and share templates.</p></details></div>
+        </div>
+      </section>
+
+      <section class="lp-section">
+        <div class="ui-wrap">
+          <div class="lp-band">
+            <div><h2>Your next ten reels are already in that video.</h2><p>Go find them. It&#39;s free, and nothing gets uploaded.</p></div>
+            <a class="ui-btn dark lg" href="#home">Start cutting <i class="ic ic-scissors"></i></a>
+          </div>
+        </div>
+      </section>
+    </div>
+  </anvil-block>
+</anvil-form>

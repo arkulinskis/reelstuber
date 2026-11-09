@@ -1,0 +1,20 @@
+<anvil-form layout="Reelstuber.Layouts.Shell">
+  <anvil-block slot="content">
+    <div class="ui-wrap">
+      <div class="ui-page-head"><div>
+        <h1>Steal a look ✨</h1>
+        <p class="muted">Templates: caption styles, layouts and colours, ready to go. Shared by creators: no videos, just the vibe.</p>
+      </div></div>
+      <div class="tp-tip">💡 <span>To use one on a single clip: open the clip, then <b>Look → Community templates</b>. &quot;Make it my default&quot; sets it for every new clip.</span></div>
+      <div class="tp-sec"><h2>From the community</h2><anvil-component type="Label" name="community_count" prop:role='["fine-print"]'></anvil-component></div>
+      <anvil-component type="RepeatingPanel" name="community_panel" prop:item_template="Reelstuber.Items.TemplateCard" prop:role='["tp-grid"]'></anvil-component>
+      <div class="ui-empty tp-empty" anvil:name="no_community">
+        <i class="ic ic-grid"></i>
+        <h3>No shared templates yet</h3>
+        <p>Make a clip look great, then share it from the clip editor.</p>
+      </div>
+      <div class="tp-sec"><h2>Reelstuber originals</h2></div>
+      <anvil-component type="RepeatingPanel" name="originals_panel" prop:item_template="Reelstuber.Items.TemplateCard" prop:role='["tp-grid"]'></anvil-component>
+    </div>
+  </anvil-block>
+</anvil-form>

@@ -1,0 +1,73 @@
+<anvil-form layout="Reelstuber.Layouts.Shell">
+  <anvil-block slot="content">
+    <div class="ui-wrap">
+      <div class="ui-page-head"><div>
+        <h1>Your look, every time</h1>
+        <anvil-component type="Label" name="lead" prop:role='["bk-lead"]'></anvil-component>
+      </div></div>
+      <div class="bk-grid">
+        <div class="bk-form">
+          <div class="ui-card">
+            <h3><i class="ic ic-user"></i>You</h3>
+            <div class="bk-two">
+              <label class="ui-field"><span>Your handle</span><anvil-component type="TextBox" name="handle_box" prop:placeholder="@yourname"></anvil-component></label>
+              <label class="ui-field"><span>Hashtags you always use</span><anvil-component type="TextBox" name="hashtags_box" prop:placeholder="#cooking #lifehacks"></anvil-component></label>
+            </div>
+            <div class="bk-chips"><span class="bk-lab">Handle corner</span><anvil-component type="RepeatingPanel" name="c_handlePos" prop:item_template="Reelstuber.Items.Chip" prop:role='["rs-chips"]'></anvil-component></div>
+          </div>
+          <div class="ui-card">
+            <h3><i class="ic ic-palette"></i>Starting look</h3>
+            <anvil-component type="RepeatingPanel" name="looks_panel" prop:item_template="Reelstuber.Items.LookTile" prop:role='["bk-looks"]'></anvil-component>
+            <p class="ui-hint">Or pick one from the <a href="#templates">community templates</a>.</p>
+            <div class="bk-chips"><span class="bk-lab">Colour grade</span><anvil-component type="RepeatingPanel" name="c_grade" prop:item_template="Reelstuber.Items.Chip" prop:role='["rs-chips"]'></anvil-component></div>
+          </div>
+          <div class="ui-card">
+            <h3><i class="ic ic-cc"></i>Captions</h3>
+            <label class="rs-switch"><span>Captions on new clips</span><input type="checkbox" anvil:dom-node="sw_captions"></label>
+            <div class="bk-chips"><anvil-component type="RepeatingPanel" name="c_capStyle" prop:item_template="Reelstuber.Items.Chip" prop:role='["rs-chips"]'></anvil-component></div>
+            <div class="bk-two bk-gap">
+              <label class="ui-field"><span>Font</span><anvil-component type="DropDown" name="font_box"></anvil-component></label>
+              <div class="bk-chips"><span class="bk-lab">Words at a time</span><anvil-component type="RepeatingPanel" name="c_capWords" prop:item_template="Reelstuber.Items.Chip" prop:role='["rs-chips"]'></anvil-component></div>
+            </div>
+            <div class="bk-colors"><label class="bk-color">Highlight<input type="color" anvil:dom-node="col_hl"></label><label class="bk-color">Text<input type="color" anvil:dom-node="col_capColor"></label></div>
+            <label class="rs-switch"><span>ALL CAPS</span><input type="checkbox" anvil:dom-node="sw_capUpper"></label>
+            <label class="rs-switch"><span>Auto emoji</span><input type="checkbox" anvil:dom-node="sw_capEmoji"></label>
+          </div>
+          <div class="ui-card">
+            <h3><i class="ic ic-type"></i>Stickers &amp; extras</h3>
+            <div class="bk-colors"><label class="bk-color">Hook sticker<input type="color" anvil:dom-node="col_hookBg"></label><label class="bk-color">Progress bar<input type="color" anvil:dom-node="col_progColor"></label></div>
+            <label class="rs-switch"><span>Progress bar</span><input type="checkbox" anvil:dom-node="sw_progress"></label>
+            <label class="rs-switch"><span>End card<small>A call to action in the last seconds.</small></span><input type="checkbox" anvil:dom-node="sw_cta"></label>
+            <label class="ui-field"><span>End card text</span><anvil-component type="TextBox" name="cta_box"></anvil-component></label>
+          </div>
+          <div class="ui-card">
+            <h3><i class="ic ic-sparkle"></i>Transitions</h3>
+            <div class="bk-chips"><span class="bk-lab">Intro</span><anvil-component type="RepeatingPanel" name="c_transIn" prop:item_template="Reelstuber.Items.Chip" prop:role='["rs-chips"]'></anvil-component></div>
+            <div class="bk-chips"><span class="bk-lab">Between cuts</span><anvil-component type="RepeatingPanel" name="c_transCut" prop:item_template="Reelstuber.Items.Chip" prop:role='["rs-chips"]'></anvil-component></div>
+            <div class="bk-chips"><span class="bk-lab">Outro</span><anvil-component type="RepeatingPanel" name="c_transOut" prop:item_template="Reelstuber.Items.Chip" prop:role='["rs-chips"]'></anvil-component></div>
+          </div>
+          <div class="ui-card">
+            <h3><i class="ic ic-phone"></i>Shape &amp; export</h3>
+            <div class="bk-chips"><anvil-component type="RepeatingPanel" name="c_aspect" prop:item_template="Reelstuber.Items.Chip" prop:role='["rs-chips"]'></anvil-component></div>
+            <div class="bk-chips"><anvil-component type="RepeatingPanel" name="c_quality" prop:item_template="Reelstuber.Items.Chip" prop:role='["rs-chips"]'></anvil-component></div>
+            <label class="rs-switch"><span>Cut silences by default<small>Snappier reels with the pauses removed.</small></span><input type="checkbox" anvil:dom-node="sw_cutSilence"></label>
+            <label class="rs-switch"><span>Punch-in zoom on loud moments</span><input type="checkbox" anvil:dom-node="sw_punch"></label>
+          </div>
+          <div class="bk-save">
+            <anvil-component type="Button" name="reset_button" prop:text="Reset" prop:role='["btn", "btn-ghost"]'></anvil-component>
+            <anvil-component type="Button" name="save_button" prop:text="Save brand kit" prop:role='["btn", "btn-primary", "ic-check"]'></anvil-component>
+          </div>
+          <div class="ui-card" anvil:name="mine_card">
+            <h3><i class="ic ic-share"></i>Templates you shared</h3>
+            <anvil-component type="RepeatingPanel" name="mine_panel" prop:item_template="Reelstuber.Items.MyTemplateRow" prop:role='["bk-tpls"]'></anvil-component>
+            <p class="muted" anvil:name="no_mine">None yet. In the clip editor, open <b>Look → Share this look</b> to add yours to the gallery.</p>
+          </div>
+        </div>
+        <div class="bk-prev">
+          <div class="phone"><anvil-component type="Reelstuber.Components.StylePreview" name="preview" prop:label="Preview of your look with a stand-in video"></anvil-component></div>
+          <p class="small muted bk-prev-note">Preview with a stand-in video</p>
+        </div>
+      </div>
+    </div>
+  </anvil-block>
+</anvil-form>
