@@ -4,6 +4,9 @@ in the browser bar."""
 import anvil.server
 
 from . import legal, router, rs, state
+from . import session_guard
+
+session_guard.start()  # an expired server session reloads quietly instead of "Session expired, refresh now"
 
 LEGAL_THEME = {"accent": "#D01F69"}  # colours for the Privacy & Terms page (the text-safe pink, --c-link in app.css)
 
