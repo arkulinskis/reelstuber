@@ -100,7 +100,7 @@
     await signOut();
 
     // ---- admin
-    await signIn('arkulinskis@gmail.com', 'Hb-local-admin-Kq7-2026', 'Local Admin');
+    await signIn('admin@example.com', 'Hb-local-admin-Kq7-2026', 'Local Admin');
     for (const tab of ['overview', 'usage', 'templates', 'feedback', 'users', 'demo']) {
       await visit('#admin/' + tab, '.ui-tabs', 'admin ' + tab);
     }
