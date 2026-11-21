@@ -84,6 +84,7 @@
     }
     function draw() {
       var exportable = P.clips.filter(function (c) { return c.status !== 'exported'; }).length;
+      var drafts = P.clips.filter(function (c) { return c.status === 'draft'; }).length;
       var tr = words().length;
       view.innerHTML = '<div class="ui-wrap">' +
         '<div class="pj-head"><a class="ui-btn sm ghost" href="#home" data-go="home">' + UI.icon('back') + 'Studio</a>' +
@@ -97,14 +98,15 @@
           '<button class="ui-btn sm" data-play aria-label="Play or pause">' + UI.icon('play') + '</button><span class="pj-time" data-time>0:00 / ' + RS.fmt(P.duration) + '</span>' +
           '<span class="ui-spacer"></span><button class="ui-btn sm" data-in>[ In</button><button class="ui-btn sm" data-out>Out ]</button>' +
           '<button class="ui-btn sm lime" data-add>' + UI.icon('plus') + 'Add clip</button></div>' +
-          '<div class="pj-ctrl"><button class="ui-btn sm" data-chapters>' + UI.icon('list') + 'Chapters → clips</button><button class="ui-btn sm" data-captions>' + UI.icon('cc') + 'Captions</button>' +
+          '<div class="pj-ctrl"><button class="ui-btn sm" data-words>' + UI.icon('type') + 'Pick from words</button><button class="ui-btn sm" data-chapters>' + UI.icon('list') + 'Chapters → clips</button><button class="ui-btn sm" data-captions>' + UI.icon('cc') + 'Captions</button>' +
           '<span class="ui-spacer"></span><span class="rs-lock">' + UI.icon('lock') + 'On this device</span></div></div></div>'
           : '<label class="pj-relink" data-relink><span class="em">📼</span><h3>Where\'s the video?</h3><p class="muted">Reelstuber never uploads your video, so it needs the file again on this device: <b>' +
             esc(P.file_name) + '</b> (' + RS.size(P.file_size) + ', ' + RS.fmt(P.duration) + '). Your clips and edits are safe.</p>' +
             '<span class="ui-btn primary">' + UI.icon('upload') + 'Choose the file</span><input type="file" accept="video/*,.mkv,.mov" data-relink-file hidden></label>') +
         '</div><div class="pj-side">' + findCard() +
         '<div><div class="pj-clips-head"><h3>Clips <span class="muted">(' + P.clips.length + ')</span></h3>' +
-        (P.clips.length && M ? '<button class="ui-btn sm" data-export-all' + (exportable ? '' : ' disabled') + '>' + UI.icon('download') + 'Export all (' + exportable + ')</button>' : '') + '</div>' +
+        (P.clips.length && M ? '<div class="ui-row">' + (drafts ? '<button class="ui-btn sm lime" data-review>' + UI.icon('eye') + 'Review (' + drafts + ')</button>' : '') +
+          '<button class="ui-btn sm" data-export-all' + (exportable ? '' : ' disabled') + '>' + UI.icon('download') + 'Export all (' + exportable + ')</button></div>' : '') + '</div>' +
         (P.clips.length ? '<div class="pj-clips">' + P.clips.map(clipRow).join('') + '</div>'
           : '<div class="ui-empty">' + UI.icon('scissors') + '<h3>No clips yet</h3><p>Tap <b>Find my reels</b>, or mark In and Out on the timeline and add one.</p></div>') +
         '</div></div></div></div>';
@@ -247,7 +249,7 @@
         P.clips = r.clips; sel = r.added[0] || null;
         draw();
         RS.confetti(90);
-        UI.toast('Found ' + UI.plural(r.added.length, 'reel') + '! Tap Edit to make one yours.', 'ok');
+        UI.toast('Found ' + UI.plural(r.added.length, 'reel') + '! Tap Review to swipe through them.', 'ok');
       }, function (e) {
         busy = false;
         if (view.isConnected) { run.hidden = true; btn.disabled = false; }
@@ -316,8 +318,18 @@
         '<div data-tx-run hidden class="pj-run"><b data-tx-msg>Starting…</b><div class="rs-progress"><i data-tx-bar></i></div></div></div>' +
         '<div class="ui-card flat tight"><h4>' + UI.icon('upload') + ' Import a subtitle file</h4><p class="small muted">An .srt or .vtt file (YouTube Studio → Subtitles → Download). Replaces what\'s here.</p>' +
         '<label class="ui-btn">' + UI.icon('upload') + 'Choose .srt / .vtt<input type="file" accept=".srt,.vtt,text/vtt" data-subs hidden></label></div>' +
+        '<div class="ui-card flat tight pf-card"><h4>' + UI.icon('search') + ' Fix a word everywhere</h4>' +
+        (n ? '<p class="small muted">Misheard a name? Fix it once and every clip in this project gets it.</p>' +
+          '<div class="pf-row"><label class="ui-field"><span>Find</span><input data-fx-f maxlength="60" placeholder="reel stuber" autocomplete="off"></label>' +
+          '<label class="ui-field"><span>Replace with</span><input data-fx-r maxlength="80" placeholder="Reelstuber" autocomplete="off"></label></div>' +
+          '<div class="pf-go"><span class="small muted" data-fx-n aria-live="polite">Type a word or a few words.</span><span class="ui-spacer"></span>' +
+          '<label class="pf-keep"><input type="checkbox" data-fx-keep checked> Remember this fix</label>' +
+          '<button type="button" class="ui-btn primary sm" data-fx-go disabled>' + UI.icon('check') + 'Replace all</button></div>'
+          : '<p class="small muted">Once this project has captions you can fix a misheard word everywhere at once.</p>') +
+        '<div data-fx-list></div></div>' +
         (n ? '<button class="ui-btn danger" data-clear>' + UI.icon('trash') + 'Remove all captions</button>' : '') + '</div>');
       var el = m.el;
+      wireFixes(el);
       el.querySelector('[data-subs]').addEventListener('change', function (e) {
         var f = e.target.files[0]; if (!f) return;
         f.text().then(function (txt) {
@@ -335,9 +347,49 @@
         var run = el.querySelector('[data-tx-run]'), bar = el.querySelector('[data-tx-bar]'), msg = el.querySelector('[data-tx-msg]');
         run.hidden = false; btn.disabled = true;
         RS.transcribe(M, ranges, lang, function (f, t) { bar.style.width = Math.round(f * 100) + '%'; msg.textContent = t; }).then(function (ws) {
-          return saveWords(RS.mergeWords(words(), ws, ranges), 'whisper').then(function () { m.close(); UI.toast('Captions ready: ' + UI.plural(ws.length, 'word'), 'ok'); RS.confetti(60); });
+          var fx = RS.applyFixes(RS.mergeWords(words(), ws, ranges));
+          return saveWords(fx.words, 'whisper').then(function () { m.close(); UI.toast('Captions ready: ' + UI.plural(ws.length, 'word') + (fx.n ? ' (your word fixes: ' + fx.n + ')' : ''), 'ok'); RS.confetti(60); });
         }).catch(function (err) { run.hidden = true; btn.disabled = false; UI.toast(err.message, 'error'); });
       };
+    }
+    /* ---------- Fix a word everywhere (inside the Captions dialog) */
+    function wireFixes(el) {
+      var f = el.querySelector('[data-fx-f]'), r = el.querySelector('[data-fx-r]'), go = el.querySelector('[data-fx-go]'), cnt = el.querySelector('[data-fx-n]'), list = el.querySelector('[data-fx-list]');
+      function drawList() {
+        var l = RS.fixes.list();
+        list.innerHTML = l.length ? '<p class="small muted pf-kept">Kept fixes (used whenever captions are written on this device):</p><div class="pf-chips">' + l.map(function (x, i) {
+          return '<span class="pf-chip"><span>' + esc(x.f) + ' → <b>' + esc(x.r) + '</b></span><button type="button" data-fx-del="' + i + '" aria-label="Forget this fix">' + UI.icon('x') + '</button></span>'; }).join('') + '</div>' +
+          (words().length ? '<button type="button" class="ui-btn sm" data-fx-all>' + UI.icon('refresh') + 'Apply kept fixes now</button>' : '') : '';
+      }
+      function count() {
+        if (!f) return;
+        var q = f.value.trim(), k = q ? RS.countWord(words(), q, r.value) : 0;
+        cnt.textContent = !q ? 'Type a word or a few words.' : k ? UI.plural(k, 'match', 'matches') + ' in this project' : 'No matches. Try fewer words.';
+        go.disabled = !(k && r.value.trim());
+      }
+      function apply(words2, n) {
+        return saveWords(words2, (P.transcript && P.transcript.source) || 'manual').then(function () { count(); drawList(); UI.toast('Fixed ' + UI.plural(n, 'place') + ' in your captions', 'ok'); });
+      }
+      if (f) {
+        f.addEventListener('input', count); r.addEventListener('input', count);
+        r.addEventListener('keydown', function (e) { if (e.key === 'Enter' && !go.disabled) { e.preventDefault(); go.click(); } });
+        go.onclick = function () {
+          var res = RS.fixWords(words(), f.value, r.value);
+          if (!res.n) { count(); return; }
+          if (el.querySelector('[data-fx-keep]').checked) RS.fixes.add(f.value, r.value);
+          UI.busy(go, apply(res.words, res.n)).then(function () { f.value = ''; r.value = ''; count(); f.focus(); });
+        };
+      }
+      list.addEventListener('click', function (e) {
+        var del = e.target.closest('[data-fx-del]');
+        if (del) { RS.fixes.remove(+del.getAttribute('data-fx-del')); drawList(); count(); return; }
+        if (e.target.closest('[data-fx-all]')) {
+          var res = RS.applyFixes(words());
+          if (!res.n) { UI.toast('Your captions already have every kept fix.'); return; }
+          apply(res.words, res.n);
+        }
+      });
+      drawList();
     }
     function mergeRanges(rs) {
       rs.sort(function (a, b) { return a[0] - b[0]; });
@@ -348,6 +400,235 @@
     function saveWords(ws, source) {
       var tr = { source: source, words: ws };
       return RS.db.updateProject(pid, { transcript: tr }).then(function () { P.transcript = tr; draw(); });
+    }
+
+    /* ---------- Pick from the words: tap the first and the last word of the transcript to make a clip */
+    function wordsModal() {
+      var ws = words();
+      if (!ws.length) {
+        var m0 = UI.modal('<h2>📝 Pick from the words</h2><div class="ui-empty">' + UI.icon('cc') + '<h3>No captions yet</h3>' +
+          '<p>Add captions first (written on this device or from a subtitle file), then make a clip by reading instead of scrubbing.</p>' +
+          '<button type="button" class="ui-btn primary" data-cap-open>' + UI.icon('cc') + 'Add captions</button></div>');
+        m0.el.querySelector('[data-cap-open]').onclick = function () { m0.close(); captionsModal(); };
+        return;
+      }
+      var idx = new Map(); ws.forEach(function (w, i) { idx.set(w, i); });
+      var lines = RS.cues(ws, -1, P.duration + 5, 14), a = null, b = null, snap = UI.store.get('rs-pick-snap', true) !== false, hits = [], hitAt = -1;
+      var m = UI.modal('<h2>📝 Pick from the words</h2><p class="muted">Tap the first word of your reel, then the last. Read it, play it, make it a clip.</p>' +
+        '<div class="pw-tools"><label class="pw-q">' + UI.icon('search') + '<input type="search" data-pw-q placeholder="Find a phrase…" aria-label="Find a phrase in the captions" autocomplete="off"></label>' +
+        '<span class="small muted" data-pw-hits aria-live="polite"></span>' +
+        RS.switchHtml('pwsnap', 'Whole sentences', snap, 'Never start or stop mid-thought.') + '</div>' +
+        '<div class="pw-text" data-pw-text>' + lines.map(function (c) {
+          return '<p class="pw-line"><button type="button" class="pw-t" data-pw-seek="' + c.s + '">' + RS.fmt(c.s) + '</button>' +
+            c.words.map(function (w) { return '<button type="button" class="pw-w" data-wi="' + idx.get(w) + '">' + esc(w[2]) + '</button>'; }).join(' ') + '</p>';
+        }).join('') + '</div>' +
+        '<div class="pw-bar"><b data-pw-sum aria-live="polite">Tap the first word</b><span class="ui-spacer"></span>' +
+        '<button type="button" class="ui-btn sm ghost" data-pw-clear hidden>' + UI.icon('x') + 'Clear</button>' +
+        '<button type="button" class="ui-btn sm" data-pw-play disabled' + (M ? '' : ' hidden') + '>' + UI.icon('play') + 'Play</button>' +
+        '<button type="button" class="ui-btn sm primary" data-pw-make disabled>' + UI.icon('scissors') + 'Make clip</button></div>',
+        { wide: true, onclose: function () { if (M && stopAt != null) { M.el.pause(); stopAt = null; } } });
+      var el = m.el, box = el.querySelector('[data-pw-text]'), btns = box.querySelectorAll('[data-wi]');
+      function span() {
+        if (a == null) return null;
+        var i = Math.min(a, b == null ? a : b), j = Math.max(a, b == null ? a : b);
+        if (snap) { var sp = RS.sentenceSpan(ws, i, j); i = sp[0]; j = sp[1]; }
+        return { i: i, j: j, s: Math.max(0, +(ws[i][0] - 0.15).toFixed(2)), e: Math.min(P.duration, +(ws[j][1] + 0.35).toFixed(2)) };
+      }
+      function paint() {
+        var r = span();
+        btns.forEach(function (x) {
+          var k = +x.getAttribute('data-wi');
+          x.classList.toggle('on', !!r && k >= r.i && k <= r.j);
+          x.classList.toggle('end', k === a || k === b);
+        });
+        var sum = el.querySelector('[data-pw-sum]'), make = el.querySelector('[data-pw-make]');
+        if (!r) sum.textContent = 'Tap the first word';
+        else if (b == null) sum.textContent = 'Now tap the last word';
+        else sum.textContent = RS.fmt(r.s) + ' → ' + RS.fmt(r.e) + ' · ' + Math.round(r.e - r.s) + ' s · ' + UI.plural(r.j - r.i + 1, 'word');
+        make.disabled = !r || b == null;
+        el.querySelector('[data-pw-play]').disabled = !r;
+        el.querySelector('[data-pw-clear]').hidden = !r;
+      }
+      function find(q) {
+        var parts = String(q || '').trim().split(/\s+/).map(RS.normWord).filter(Boolean);
+        btns.forEach(function (x) { x.classList.remove('hit'); });
+        hits = []; hitAt = -1;
+        if (parts.length) {
+          for (var i = 0; i + parts.length <= ws.length; i++) {
+            var ok = true;
+            for (var k = 0; k < parts.length && ok; k++) {
+              var w = RS.normWord(ws[i + k][2]);
+              ok = k === parts.length - 1 ? w.indexOf(parts[k]) === 0 : w === parts[k];
+            }
+            if (ok) { hits.push(i); for (var h = 0; h < parts.length; h++) btns[i + h].classList.add('hit'); }
+          }
+        }
+        el.querySelector('[data-pw-hits]').textContent = !parts.length ? '' : hits.length ? UI.plural(hits.length, 'match', 'matches') + (hits.length > 1 ? ' · Enter for the next' : '') : 'Not found';
+        if (hits.length) jump();
+      }
+      function jump() {
+        if (!hits.length) return;
+        hitAt = (hitAt + 1) % hits.length;
+        var x = btns[hits[hitAt]]; if (x) x.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      }
+      box.addEventListener('click', function (e) {
+        var sk = e.target.closest('[data-pw-seek]');
+        if (sk && M) { stopAt = null; RS.seek(M.el, +sk.getAttribute('data-pw-seek')).then(drawTl); return; }
+        var w = e.target.closest('[data-wi]'); if (!w) return;
+        var k = +w.getAttribute('data-wi');
+        if (a == null || b != null) { a = k; b = null; } else b = k;
+        paint();
+      });
+      el.addEventListener('change', function (e) {
+        if (e.target.matches('[data-k="pwsnap"]')) { snap = e.target.checked; UI.store.set('rs-pick-snap', snap); paint(); }
+      });
+      var q = el.querySelector('[data-pw-q]');
+      q.addEventListener('input', RS.debounce(function () { find(q.value); }, 180));
+      q.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); jump(); } });
+      el.querySelector('[data-pw-clear]').onclick = function () { a = b = null; paint(); };
+      el.querySelector('[data-pw-play]').onclick = function () {
+        var r = span(); if (!r || !M) return;
+        stopAt = r.e; RS.seek(M.el, r.s).then(function () { drawTl(); M.el.play().catch(function () {}); });
+      };
+      el.querySelector('[data-pw-make]').onclick = function (e) {
+        var r = span(); if (!r) return;
+        if (r.e - r.s < 1) { UI.toast('Pick a few more words: a clip needs at least 1 second.', 'error'); return; }
+        if (r.e - r.s > 600) { UI.toast('That\'s longer than 10 minutes. Pick a shorter stretch.', 'error'); return; }
+        var picked = ws.slice(r.i, r.j + 1), title = picked.slice(0, 7).map(function (w) { return w[2]; }).join(' ').replace(/[.,!?;:]+$/, '');
+        var clip = { start: r.s, end: r.e, title: title.charAt(0).toUpperCase() + title.slice(1), label: '📝 From words', source: 'manual', style: RS.styleFor() };
+        UI.busy(e.currentTarget, RS.db.addClips(pid, [clip])).then(function (res) {
+          if (M) { M.el.pause(); stopAt = null; }
+          P.clips = res.clips; sel = res.added[0] || null; a = b = null; paint(); draw();
+          UI.toast('Clip added: ' + clip.title, 'ok');
+          RS.confetti(40);
+        });
+      };
+      paint();
+    }
+
+    /* ---------- Quick review: swipe through the drafts in their real look, keep or skip, nudge the ends */
+    function reviewDeck() {
+      if (!M) return;
+      var list = P.clips.filter(function (c) { return c.status === 'draft'; });
+      if (!list.length) { UI.toast('No drafts to review: every clip is ready or exported.'); return; }
+      M.el.pause(); stopAt = null;
+      var i = 0, done = [], player = null, plan = null, busyNow = false, swiped = false;
+      var m = UI.modal('<div class="rv" data-rv></div>', { onclose: function () {
+        if (player) player.destroy(); player = null; document.removeEventListener('keydown', key); draw();
+      } });
+      var root = m.el.querySelector('[data-rv]');
+      m.el.classList.add('rv-modal');
+      function key(e) {
+        if (e.target.closest('input,textarea,select') || !root.querySelector('[data-rv-keep]')) return;
+        if (e.key === 'ArrowRight') { e.preventDefault(); decide(true); }
+        else if (e.key === 'ArrowLeft') { e.preventDefault(); decide(false); }
+        else if (e.key === ' ') { e.preventDefault(); if (player) player.toggle(); }
+      }
+      document.addEventListener('keydown', key);
+      function card() {
+        if (player) { player.destroy(); player = null; }
+        if (i >= list.length) return summary();
+        var c = list[i];
+        plan = RS.plan(c, words(), A);
+        root.innerHTML = '<div class="rv-top"><span class="ui-badge">' + (i + 1) + ' / ' + list.length + '</span>' +
+          (c.score != null ? '<span class="pj-score">' + Math.round(c.score) + '</span>' : '') + (c.label ? '<span class="small muted">' + esc(c.label) + '</span>' : '') +
+          '<span class="ui-spacer"></span>' + (i ? '<button type="button" class="ui-btn sm ghost" data-rv-back>' + UI.icon('back') + 'Back</button>' : '') + '</div>' +
+          '<h2 class="rv-title">' + esc(c.title || 'Clip') + '</h2>' +
+          '<div class="rv-card" data-rv-card><canvas data-rv-cv aria-label="Preview of the reel"></canvas><button type="button" class="rv-play" data-rv-play aria-label="Play or pause">' + UI.icon('play') + '</button>' +
+          '<span class="rv-stamp keep">KEEP</span><span class="rv-stamp skip">SKIP</span></div>' +
+          '<div class="rv-trim">' + ['s', 'e'].map(function (k) {
+            return '<div><span>' + (k === 's' ? 'Start' : 'End') + '</span><button type="button" class="ui-btn sm" data-nudge="' + k + '" data-d="-1" aria-label="' + (k === 's' ? 'Start' : 'End') + ' 1 second earlier">−1s</button>' +
+              '<b data-rv-' + k + '>' + RS.fmt(k === 's' ? c.start : c.end) + '</b><button type="button" class="ui-btn sm" data-nudge="' + k + '" data-d="1" aria-label="' + (k === 's' ? 'Start' : 'End') + ' 1 second later">+1s</button></div>';
+          }).join('') + '</div>' +
+          '<div class="rv-acts"><button type="button" class="ui-btn lg" data-rv-skip>' + UI.icon('x') + 'Skip</button>' +
+          '<button type="button" class="ui-btn lg primary" data-rv-keep>' + UI.icon('heart') + 'Keep</button></div>' +
+          '<p class="ui-hint rv-hint">Swipe right to keep, left to skip (or ← →). Kept reels are marked Ready.</p>';
+        var cv = root.querySelector('[data-rv-cv]'), d = RS.dims(plan.st.aspect, '720'), k2 = 0.5;
+        cv.width = Math.round(d[0] * k2); cv.height = Math.round(d[1] * k2);
+        player = RS.Player(cv, M, function () { return plan; }, function (o, D, playing) {
+          var pp = root.querySelector('[data-rv-play]'); if (pp) { pp.innerHTML = UI.icon(playing ? 'pause' : 'play'); pp.classList.toggle('on', playing); }
+        });
+        wireSwipe(root.querySelector('[data-rv-card]'));
+        RS.fontsReady().then(function () { return RS.seek(M.el, plan.segs[0][0]); }).then(function () { if (player) { player.draw(); player.play(); } });
+      }
+      function wireSwipe(cardEl) {
+        var x0 = null, dx = 0;
+        cardEl.addEventListener('pointerdown', function (e) { x0 = e.clientX; dx = 0; cardEl.classList.add('dragging'); try { cardEl.setPointerCapture(e.pointerId); } catch (er) {} });
+        cardEl.addEventListener('pointermove', function (e) {
+          if (x0 == null) return;
+          dx = e.clientX - x0;
+          cardEl.style.transform = 'translateX(' + dx + 'px) rotate(' + (dx / 22) + 'deg)';
+          cardEl.classList.toggle('lean-keep', dx > 50); cardEl.classList.toggle('lean-skip', dx < -50);
+        });
+        function end() {
+          if (x0 == null) return;
+          x0 = null; cardEl.style.transform = ''; cardEl.classList.remove('lean-keep', 'lean-skip', 'dragging');
+          swiped = Math.abs(dx) >= 6;
+          if (dx > 80) decide(true); else if (dx < -80) decide(false);
+        }
+        cardEl.addEventListener('pointerup', end); cardEl.addEventListener('pointercancel', end);
+      }
+      function decide(keep) {
+        if (busyNow || i >= list.length) return;
+        var c = list[i], cardEl = root.querySelector('[data-rv-card]');
+        busyNow = true;
+        if (cardEl) cardEl.classList.add(keep ? 'fly-keep' : 'fly-skip');
+        var save = keep ? RS.db.saveClip(c.id, { status: 'ready' }).then(function (nc) { Object.assign(c, nc); }) : Promise.resolve();
+        Promise.all([save, new Promise(function (r) { setTimeout(r, 200); })]).then(function () {
+          done.push({ c: c, keep: keep }); i++; busyNow = false; card();
+        }, function (err) { busyNow = false; if (cardEl) cardEl.classList.remove('fly-keep', 'fly-skip'); UI.toast(err.message, 'error'); });
+      }
+      function back() {
+        if (busyNow || !done.length) return;
+        var last = done.pop(); i--;
+        if (!last.keep) { card(); return; }
+        busyNow = true;
+        RS.db.saveClip(last.c.id, { status: 'draft' }).then(function (nc) { Object.assign(last.c, nc); busyNow = false; card(); }, function (err) { busyNow = false; UI.toast(err.message, 'error'); });
+      }
+      function nudge(k, d) {
+        var c = list[i]; if (!c || busyNow) return;
+        var s = c.start, e = c.end;
+        if (k === 's') s = RS.clamp(s + d, 0, e - 1); else e = RS.clamp(e + d, s + 1, P.duration);
+        if (e - s > 600 || (s === c.start && e === c.end)) return;
+        busyNow = true;
+        RS.db.saveClip(c.id, { start: +s.toFixed(2), end: +e.toFixed(2) }).then(function (nc) {
+          busyNow = false; Object.assign(c, nc);
+          plan = RS.plan(c, words(), A);
+          root.querySelector('[data-rv-s]').textContent = RS.fmt(c.start); root.querySelector('[data-rv-e]').textContent = RS.fmt(c.end);
+          if (player) { player.pause(); RS.seek(M.el, k === 's' ? plan.segs[0][0] : Math.max(plan.segs[0][0], c.end - 2.5)).then(function () { if (player) player.play(); }); }
+        }, function (err) { busyNow = false; UI.toast(err.message, 'error'); });
+      }
+      function summary() {
+        var kept = done.filter(function (x) { return x.keep; }).map(function (x) { return x.c; }), skipped = done.filter(function (x) { return !x.keep; }).map(function (x) { return x.c; });
+        root.innerHTML = '<div class="rv-sum"><span class="rv-big" aria-hidden="true">' + (kept.length ? '🎉' : '🤔') + '</span>' +
+          '<h2>' + (kept.length ? 'Kept ' + UI.plural(kept.length, 'reel') : 'Nothing kept this time') + '</h2>' +
+          '<p class="muted">' + (skipped.length ? UI.plural(skipped.length, 'draft') + ' skipped. They stay in the list until you remove them.' : 'You kept every one.') + '</p>' +
+          '<div class="rv-sum-acts">' + (kept.length && RS.canExport() ? '<button type="button" class="ui-btn primary lg" data-rv-export>' + UI.icon('download') + 'Export the kept ones (' + kept.length + ')</button>' : '') +
+          (skipped.length ? '<button type="button" class="ui-btn danger" data-rv-remove>' + UI.icon('trash') + 'Remove skipped drafts (' + skipped.length + ')</button>' : '') +
+          (!kept.length ? '<button type="button" class="ui-btn" data-rv-again>' + UI.icon('refresh') + 'Review again</button>' : '') +
+          '<button type="button" class="ui-btn ghost" data-close>Done</button></div></div>';
+        if (kept.length) RS.confetti(70);
+        var ex = root.querySelector('[data-rv-export]');
+        if (ex) ex.onclick = function () { m.close(); exportAll(kept); };
+        var rm = root.querySelector('[data-rv-remove]');
+        if (rm) rm.onclick = function () {
+          UI.busy(rm, Promise.all(skipped.map(function (c) { return RS.db.deleteClip(c.id); }))).then(function () {
+            var gone = skipped.map(function (c) { return c.id; });
+            P.clips = P.clips.filter(function (c) { return gone.indexOf(c.id) < 0; });
+            rm.remove(); UI.toast('Removed ' + UI.plural(gone.length, 'draft'), 'ok');
+          });
+        };
+        var again = root.querySelector('[data-rv-again]');
+        if (again) again.onclick = function () { i = 0; done = []; card(); };
+      }
+      root.addEventListener('click', function (e) {
+        if (e.target.closest('[data-rv-keep]')) decide(true);
+        else if (e.target.closest('[data-rv-skip]')) decide(false);
+        else if (e.target.closest('[data-rv-back]')) back();
+        else if (e.target.closest('[data-rv-card]')) { if (swiped) swiped = false; else if (player) player.toggle(); }
+        else { var n = e.target.closest('[data-nudge]'); if (n) nudge(n.getAttribute('data-nudge'), +n.getAttribute('data-d')); }
+      });
+      card();
     }
 
     /* ---------- menus */
@@ -374,7 +655,9 @@
     function projectMenu(btn) {
       popMenu(btn, [
         { icon: 'cc', label: 'Captions', go: captionsModal },
+        { icon: 'type', label: 'Pick from words', go: wordsModal },
         { icon: 'list', label: 'Chapters → clips', go: chaptersModal },
+        { icon: 'eye', label: 'Review drafts', go: reviewDeck },
         { icon: 'trash', label: 'Delete project', danger: true, go: function () {
           UI.confirm({ title: 'Delete this project?', text: 'All its clips and edits are deleted, and the copy of the video kept in this browser. Your original file isn\'t touched.', ok: 'Delete', danger: true })
             .then(function (yes) { if (yes) RS.db.deleteProject(pid).then(function () { RS.media.forget(pid); UI.toast('Project deleted'); UI.go('home'); }); });
@@ -383,8 +666,8 @@
     }
 
     /* ---------- export all */
-    function exportAll() {
-      var list = P.clips.filter(function (c) { return c.status !== 'exported'; });
+    function exportAll(only) {
+      var list = Array.isArray(only) ? only : P.clips.filter(function (c) { return c.status !== 'exported'; });
       if (!list.length) return;
       var signal = { aborted: false };
       var m = UI.modal('<h2>Export ' + UI.plural(list.length, 'reel') + '</h2><p class="muted">Each reel plays through once while it records, so this takes about as long as the clips. Keep this tab open.</p>' +
@@ -431,6 +714,8 @@
       if (t.closest('[data-out]')) { outT = M.el.currentTime; if (inT != null && inT >= outT) inT = null; drawTl(); return; }
       if (t.closest('[data-add]')) { addClip(); return; }
       if (t.closest('[data-chapters]')) { chaptersModal(); return; }
+      if (t.closest('[data-words]')) { wordsModal(); return; }
+      if (t.closest('[data-review]')) { reviewDeck(); return; }
       if (t.closest('[data-captions]')) { captionsModal(); return; }
       if (t.closest('[data-export-all]')) { exportAll(); return; }
       if (t.closest('[data-find-go]')) { runFind().catch(function (err) { UI.toast(err.message, 'error'); }); return; }
@@ -1124,7 +1409,7 @@
       run.hidden = false; btn.disabled = true;
       var ranges = [[C.start, C.end]];
       RS.transcribe(M, ranges, 'en', function (f, t) { bar.style.width = Math.round(f * 100) + '%'; msg.textContent = t; }).then(function (ws) {
-        P.transcript = { source: 'whisper', words: RS.mergeWords(words(), ws, ranges) };
+        P.transcript = { source: 'whisper', words: RS.applyFixes(RS.mergeWords(words(), ws, ranges)).words };
         return RS.db.updateProject(pid, { transcript: P.transcript }).then(function () { replan(); drawPanel(); player && player.draw(); UI.toast('Captions ready!', 'ok'); });
       }).catch(function (e) { run.hidden = true; btn.disabled = false; UI.toast(e.message, 'error'); });
     }

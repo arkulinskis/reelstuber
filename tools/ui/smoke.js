@@ -45,6 +45,21 @@
     await visit('#project/' + encodeURIComponent(pid), '.ui-main canvas, .ui-main video', who + ': project page');
     let p = await RS.db.project(pid);
     if (!p.clips.length) { await RS.db.addClips(pid, [{ start: 2, end: 14, title: 'Smoke clip' }]); p = await RS.db.project(pid); }
+    if (!p.clips.some((c) => c.status === 'draft')) { await RS.db.addClips(pid, [{ start: 3, end: 15, title: 'Smoke draft' }]); p = await RS.db.project(pid); }
+    location.hash = '#home'; await until(() => window.UI_READY && $('.st-drop'), 'studio');
+    await visit('#project/' + encodeURIComponent(pid), '.ui-main canvas, .ui-main video', who + ': project page with clips');
+    // the 2026-11-20 dialogs open without errors: Pick from words, Review drafts, Captions (Fix a word everywhere)
+    for (const [btn, sel, what] of [['[data-words]', '.pw-text .pw-w', 'pick from words'], ['[data-review]', '[data-rv-card] canvas', 'review deck'], ['[data-captions]', '.pf-card', 'fix a word']]) {
+      const b = $(btn); if (!b) { say('skip ' + what + ' (no button)'); continue; }
+      b.click();
+      await until(() => $('.ui-modal-wrap ' + sel), who + ': ' + what, 15000);
+      await sleep(600);
+      const pr = problems();
+      ok(!pr.length, who + ': ' + what + ' opens without errors ' + (pr.length ? JSON.stringify(pr) : ''));
+      $('.ui-modal-wrap [data-close]').click();
+      await until(() => !$('.ui-modal-wrap'), 'dialog closed', 5000);
+      await sleep(300);
+    }
     await visit('#clip/' + encodeURIComponent(pid) + '/' + encodeURIComponent(p.clips[0].id), '.ui-main canvas', who + ': clip editor');
   }
   async function signOut() {

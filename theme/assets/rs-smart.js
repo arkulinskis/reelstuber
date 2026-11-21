@@ -264,6 +264,70 @@
     ws.forEach(function (w) { var d = (e - s) * (w.length + 2) / tot; out.push([+t.toFixed(3), +(t + d).toFixed(3), w.slice(0, 40)]); t += d; });
     return out;
   };
+
+  /* ---------- Pick from the words: widen words i..j to whole sentences (a sentence ends on . ! ? or a 0.9 s pause) */
+  RS.sentenceSpan = function (words, i, j) {
+    function ends(k) { return k < 0 || /[.!?…]["”’)]*$/.test(words[k][2]) || !!(words[k + 1] && words[k + 1][0] - words[k][1] > 0.9); }
+    while (i > 0 && !ends(i - 1)) i--;
+    while (j < words.length - 1 && !ends(j)) j++;
+    return [i, j];
+  };
+
+  /* ---------- Fix a word everywhere: caption find & replace (whole words, any case, several words both ways) */
+  function normWord(w) { return String(w || '').toLowerCase().replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/gu, ''); }
+  RS.normWord = normWord;
+  function findParts(find) { return String(find || '').trim().split(/\s+/).map(normWord).filter(Boolean); }
+  function matchAt(words, i, parts) {
+    if (i + parts.length > words.length) return false;
+    for (var k = 0; k < parts.length; k++) if (normWord(words[i + k][2]) !== parts[k]) return false;
+    return true;
+  }
+  /* Walk the words: onHit(i) for each match of find, skipping places that already read as the replacement
+     (so "pip" -> "Pip the Mascot" never grows into "Pip the Mascot the Mascot" when applied again). */
+  function scanWords(words, find, repl, onHit, onKeep) {
+    var parts = findParts(find), rparts = findParts(repl), n = 0;
+    if (!parts.length) return 0;
+    for (var i = 0; i < words.length; i++) {
+      if (rparts.length > parts.length && matchAt(words, i, rparts)) { for (var k = 0; k < rparts.length; k++) onKeep(words[i + k]); i += rparts.length - 1; continue; }
+      if (!matchAt(words, i, parts)) { onKeep(words[i]); continue; }
+      onHit(i, parts.length); n++; i += parts.length - 1;
+    }
+    return n;
+  }
+  RS.countWord = function (words, find, repl) { return scanWords(words || [], find, repl || '', function () {}, function () {}); };
+  /* -> {words, n}: each match is replaced, spread over the matched time, keeping the punctuation around it */
+  RS.fixWords = function (words, find, repl) {
+    var out = [];
+    words = words || [];
+    repl = String(repl || '').trim().slice(0, 80);
+    if (!findParts(find).length || !repl) return { words: words.slice(), n: 0 };
+    var n = scanWords(words, find, repl, function (i, len) {
+      var last = words[i + len - 1];
+      var lead = (String(words[i][2]).match(/^[^\p{L}\p{N}]+/u) || [''])[0], tail = (String(last[2]).match(/[^\p{L}\p{N}]+$/u) || [''])[0];
+      out = out.concat(RS.spread(lead + repl + tail, words[i][0], Math.max(words[i][0] + 0.1, last[1])));
+    }, function (w) { out.push(w); });
+    return { words: n ? out : words.slice(), n: n };
+  };
+  /* The fixes someone keeps, in this browser: [{f: find, r: replace}] */
+  RS.fixes = {
+    KEY: 'rs-word-fixes',
+    list: function () { try { var l = UI.store.get(RS.fixes.KEY, []); return Array.isArray(l) ? l.filter(function (x) { return x && x.f && x.r; }) : []; } catch (e) { return []; } },
+    save: function (l) { try { UI.store.set(RS.fixes.KEY, l.slice(0, 60)); } catch (e) {} },
+    add: function (f, r) {
+      f = String(f || '').trim().slice(0, 60); r = String(r || '').trim().slice(0, 80);
+      if (!findParts(f).length || !r) return;
+      var key = findParts(f).join(' ');
+      var l = RS.fixes.list().filter(function (x) { return findParts(x.f).join(' ') !== key; });
+      l.unshift({ f: f, r: r }); RS.fixes.save(l);
+    },
+    remove: function (i) { var l = RS.fixes.list(); l.splice(i, 1); RS.fixes.save(l); }
+  };
+  /* Apply every kept fix (after on-device captions are written) -> {words, n} */
+  RS.applyFixes = function (words) {
+    var ws = words || [], n = 0;
+    RS.fixes.list().forEach(function (x) { var r = RS.fixWords(ws, x.f, x.r); ws = r.words; n += r.n; });
+    return { words: ws, n: n };
+  };
   RS.parseSubs = function (text) {
     var out = [], blocks = String(text || '').replace(/\r/g, '').split(/\n\s*\n/);
     var tm = /(\d{1,2}:)?(\d{1,2}):(\d{2})[.,](\d{1,3})\s*-->\s*(\d{1,2}:)?(\d{1,2}):(\d{2})[.,](\d{1,3})/;
